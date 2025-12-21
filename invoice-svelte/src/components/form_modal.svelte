@@ -1,11 +1,22 @@
 <script lang="ts">
-  let { 
+  import type { Snippet } from 'svelte';
+
+  let {
     isOpen = $bindable(false),
     title = 'Formulario',
     confirmText = 'Guardar',
     cancelText = 'Cancelar',
     onConfirm = () => {},
-    onCancel = () => {}
+    onCancel = () => {},
+    children,
+  }: {
+    isOpen: boolean;
+    title: string;
+    confirmText: string;
+    cancelText: string;
+    onConfirm: () => void;
+    onCancel: () => void;
+    children: Snippet;
   } = $props();
 
   function handleConfirm() {
@@ -22,11 +33,11 @@
   <div class="modal modal-open">
     <div class="modal-box">
       <h3 class="font-bold text-lg">{title}</h3>
-      
+
       <div class="py-4">
-        {@render children?.()}
+        {@render children()}
       </div>
-      
+
       <div class="modal-action">
         <button onclick={handleCancel} class="btn">{cancelText}</button>
         <button onclick={handleConfirm} class="btn btn-primary">{confirmText}</button>

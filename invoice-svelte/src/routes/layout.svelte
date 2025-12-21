@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
-  import Header from "../components/header.svelte";
+  import type { Snippet } from 'svelte';
+  import Header from '../components/header.svelte';
 
-	let { children }: { children: Snippet } = $props();
+  let { children }: { children: Snippet } = $props();
 </script>
 
 <div class="min-h-screen bg-base-200">
   <Header />
-  
+
   <main class="container mx-auto px-4 py-8">
     {@render children()}
   </main>
@@ -17,7 +17,7 @@
       <p class="font-bold">MiTienda © 2024 - Todos los derechos reservados</p>
     </div>
     <div>
-      <div class="grid grid-flow-col gap-4">
+      <div class="flex flex-wrap justify-center gap-4">
         <a href="/about" class="link link-hover">Acerca de</a>
         <a href="/contact" class="link link-hover">Contacto</a>
         <a href="/privacy" class="link link-hover">Privacidad</a>

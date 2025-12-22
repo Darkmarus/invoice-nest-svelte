@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 import { productApiService } from '../api/products_api';
 import type { CreateProductRequest } from '../models/product_request';
-import type { ProductResponse, ProductsResponse } from '../models/product_response';
+import type { ProductResponse } from '../models/product_response';
 
 export interface ProductsState {
   data: ProductResponse[];
@@ -30,23 +30,23 @@ function createProductsStore() {
   const fetchData = async (params: any) => {
     currentParams = params;
     update((state) => ({ ...state, loading: true, error: null }));
-    try {
-      const response: ProductsResponse = await productApiService.fetchProducts(params);
-      set({
-        data: response.data,
-        loading: false,
-        error: null,
-        page: response.page,
-        limit: response.limit,
-        total: response.total,
-        totalPages: response.totalPages,
-      });
-    } catch (error) {
+    const [err, response] = await productApiService.fetchProducts(params);
+    if (err) {
       update((state) => ({
         ...state,
         loading: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: err.message,
       }));
+    } else {
+      set({
+        data: response!.data,
+        loading: false,
+        error: null,
+        page: response!.page,
+        limit: response!.limit,
+        total: response!.total,
+        totalPages: response!.totalPages,
+      });
     }
   };
 
@@ -54,12 +54,11 @@ function createProductsStore() {
     subscribe,
     fetch: fetchData,
     create: async (data: CreateProductRequest) => {
-      try {
-        await productApiService.createProduct(data);
-        await fetchData(currentParams);
-      } catch (error) {
-        throw error;
+      const [err] = await productApiService.createProduct(data);
+      if (err) {
+        throw new Error(err.message);
       }
+      await fetchData(currentParams);
     },
   };
 }

@@ -19,7 +19,11 @@ export class ApiClient {
     };
   }
 
-  private async request<T>(url: string, options: RequestInit = {}, retries: number = 3): Promise<T> {
+  private async request<T>(
+    url: string,
+    options: RequestInit = {},
+    retries: number = 3
+  ): Promise<[ApiError | null, T | null]> {
     const config: RequestInit = {
       headers: this.defaultHeaders,
       ...options,
@@ -31,27 +35,28 @@ export class ApiClient {
 
         if (!response.ok) {
           const errorText = await response.text();
-          throw new ApiError(response.status, errorText || response.statusText);
+          return [new ApiError(response.status, errorText || response.statusText), null];
         }
 
         if (response.status === 204) {
-          return undefined as T;
+          return [null, undefined as T];
         }
 
-        return await response.json();
+        const data = await response.json();
+        return [null, data];
       } catch (error) {
         if (attempt === retries || !(error instanceof TypeError)) {
-          throw error;
+          return [error as ApiError, null];
         }
         // Wait before retry (exponential backoff)
         await new Promise((resolve) => setTimeout(resolve, 1000 * Math.pow(2, attempt)));
       }
     }
 
-    throw new Error('Max retries exceeded');
+    return [new ApiError(0, 'Max retries exceeded'), null];
   }
 
-  async get<T>(url: string, params?: Record<string, string | number | boolean>): Promise<T> {
+  async get<T>(url: string, params?: Record<string, string | number | boolean>): Promise<[ApiError | null, T | null]> {
     let fullUrl = url;
     if (params) {
       const urlObj = new URL(url, window.location.origin);
@@ -65,21 +70,21 @@ export class ApiClient {
     return this.request<T>(fullUrl, { method: 'GET' });
   }
 
-  async post<T>(url: string, data?: any): Promise<T> {
+  async post<T>(url: string, data?: any): Promise<[ApiError | null, T | null]> {
     return this.request<T>(url, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async put<T>(url: string, data?: any): Promise<T> {
+  async put<T>(url: string, data?: any): Promise<[ApiError | null, T | null]> {
     return this.request<T>(url, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async delete<T>(url: string): Promise<T> {
+  async delete<T>(url: string): Promise<[ApiError | null, T | null]> {
     return this.request<T>(url, { method: 'DELETE' });
   }
 }

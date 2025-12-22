@@ -1,5 +1,6 @@
 <script lang="ts">
   import ProductCard from './product_card.svelte';
+  import Pagination from './pagination.svelte';
 
   let currentPage = $state(1);
   const itemsPerPage = 6;
@@ -120,22 +121,8 @@
   const endIndex = $derived(startIndex + itemsPerPage);
   const products = $derived(allProducts.slice(startIndex, endIndex));
 
-  function goToPage(page: number) {
-    if (page >= 1 && page <= totalPages) {
-      currentPage = page;
-    }
-  }
-
-  function previousPage() {
-    if (currentPage > 1) {
-      currentPage--;
-    }
-  }
-
-  function nextPage() {
-    if (currentPage < totalPages) {
-      currentPage++;
-    }
+  function handlePageChange(page: number) {
+    currentPage = page;
   }
 </script>
 
@@ -147,35 +134,13 @@
       {/each}
     </div>
 
-    {#if totalPages > 1}
-      <div class="flex justify-center mt-8">
-        <div class="join">
-          <button class="join-item btn" class:btn-disabled={currentPage === 1} onclick={previousPage}> « </button>
-
-          {#each Array(totalPages) as _, i}
-            <button class="join-item btn" class:btn-active={currentPage === i + 1} onclick={() => goToPage(i + 1)}>
-              {i + 1}
-            </button>
-          {/each}
-
-          <button class="join-item btn" class:btn-disabled={currentPage === totalPages} onclick={nextPage}> » </button>
-
-          {#each Array(totalPages) as _, i}
-            <button class="join-item btn" class:btn-active={currentPage === i + 1} onclick={() => goToPage(i + 1)}>
-              {i + 1}
-            </button>
-          {/each}
-
-          <button class="join-item btn" class:btn-disabled={currentPage === totalPages} onclick={nextPage}> » </button>
-        </div>
-      </div>
-
-      <div class="text-center mt-4">
-        <p class="text-sm text-base-content/60">
-          Mostrando {startIndex + 1}-{Math.min(endIndex, allProducts.length)} de
-          {allProducts.length} productos
-        </p>
-      </div>
-    {/if}
+     <Pagination
+       {currentPage}
+       {totalPages}
+       totalItems={allProducts.length}
+       itemsPerPage={itemsPerPage}
+       itemName="productos"
+       onPageChange={handlePageChange}
+     />
   </div>
 </section>

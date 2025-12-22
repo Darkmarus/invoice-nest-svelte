@@ -18,16 +18,16 @@ let loaded = false;
 export const loadConfig = async () => {
   if (loaded) return;
   configStore.set({ apiUrl: '', loading: true, error: null });
-  try {
-    const { apiUrl } = await apiClient.get<{ apiUrl: string }>('/config.json');
-    configStore.set({ apiUrl, loading: false, error: null });
-    loaded = true;
-  } catch (e) {
+  const [err, data] = await apiClient.get<{ apiUrl: string }>('/config.json');
+  if (err) {
     configStore.set({
       apiUrl: '',
       loading: false,
-      error: e instanceof Error ? e.message : 'Config error',
+      error: err.message,
     });
+  } else {
+    configStore.set({ apiUrl: data!.apiUrl, loading: false, error: null });
+    loaded = true;
   }
 };
 

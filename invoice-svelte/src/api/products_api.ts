@@ -13,59 +13,24 @@ export class ProductApiService {
     enabled?: boolean;
     sortBy?: 'name' | 'price' | 'stock' | 'created_at' | 'updated_at';
     sortOrder?: 'ASC' | 'DESC';
-  }): Promise<ProductsResponse> {
-    try {
-      return await apiClient.get<ProductsResponse>(`${apiUrl()}/products`, params);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw new Error(`Failed to fetch products: ${error.message}`);
-      }
-      throw error;
-    }
+  }): Promise<[ApiError | null, ProductsResponse | null]> {
+    return apiClient.get<ProductsResponse>(`${apiUrl()}/products`, params);
   }
 
-  async createProduct(data: CreateProductRequest): Promise<void> {
-    try {
-      await apiClient.post<void>(`${apiUrl()}/products`, data);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw new Error(`Failed to create product: ${error.message}`);
-      }
-      throw error;
-    }
+  async createProduct(data: CreateProductRequest): Promise<[ApiError | null, void | null]> {
+    return apiClient.post<void>(`${apiUrl()}/products`, data);
   }
 
-  async fetchProduct(id: string): Promise<ProductResponse> {
-    try {
-      return await apiClient.get<ProductResponse>(`${apiUrl()}/products/${id}`);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw new Error(`Failed to fetch product: ${error.message}`);
-      }
-      throw error;
-    }
+  async fetchProduct(id: string): Promise<[ApiError | null, ProductResponse | null]> {
+    return apiClient.get<ProductResponse>(`${apiUrl()}/products/${id}`);
   }
 
-  async updateProduct(id: string, data: UpdateProductRequest): Promise<ProductResponse> {
-    try {
-      return await apiClient.put<ProductResponse>(`${apiUrl()}/products/${id}`, data);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw new Error(`Failed to update product: ${error.message}`);
-      }
-      throw error;
-    }
+  async updateProduct(id: string, data: UpdateProductRequest): Promise<[ApiError | null, ProductResponse | null]> {
+    return apiClient.put<ProductResponse>(`${apiUrl()}/products/${id}`, data);
   }
 
-  async deleteProduct(id: string): Promise<void> {
-    try {
-      await apiClient.delete<void>(`${apiUrl()}/products/${id}`);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw new Error(`Failed to delete product: ${error.message}`);
-      }
-      throw error;
-    }
+  async deleteProduct(id: string): Promise<[ApiError | null, void | null]> {
+    return apiClient.delete<void>(`${apiUrl()}/products/${id}`);
   }
 }
 

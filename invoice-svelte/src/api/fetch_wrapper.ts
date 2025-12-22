@@ -10,23 +10,16 @@ export class ApiError extends Error {
 }
 
 export class ApiClient {
-  private baseURL: string;
   private defaultHeaders: Record<string, string>;
 
-  constructor(baseURL: string = '', defaultHeaders: Record<string, string> = {}) {
-    this.baseURL = baseURL;
+  constructor(defaultHeaders: Record<string, string> = {}) {
     this.defaultHeaders = {
       'Content-Type': 'application/json',
       ...defaultHeaders,
     };
   }
 
-  setBaseURL(url: string) {
-    this.baseURL = url;
-  }
-
-  private async request<T>(endpoint: string, options: RequestInit = {}, retries: number = 3): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
+  private async request<T>(url: string, options: RequestInit = {}, retries: number = 3): Promise<T> {
     const config: RequestInit = {
       headers: this.defaultHeaders,
       ...options,
@@ -58,34 +51,36 @@ export class ApiClient {
     throw new Error('Max retries exceeded');
   }
 
-  async get<T>(endpoint: string, params?: Record<string, string | number | boolean>): Promise<T> {
-    const url = new URL(endpoint, this.baseURL);
+  async get<T>(url: string, params?: Record<string, string | number | boolean>): Promise<T> {
+    let fullUrl = url;
     if (params) {
+      const urlObj = new URL(url, window.location.origin);
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          url.searchParams.set(key, String(value));
+          urlObj.searchParams.set(key, String(value));
         }
       });
+      fullUrl = urlObj.href;
     }
-    return this.request<T>(url.pathname + url.search, { method: 'GET' });
+    return this.request<T>(fullUrl, { method: 'GET' });
   }
 
-  async post<T>(endpoint: string, data?: any): Promise<T> {
-    return this.request<T>(endpoint, {
+  async post<T>(url: string, data?: any): Promise<T> {
+    return this.request<T>(url, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async put<T>(endpoint: string, data?: any): Promise<T> {
-    return this.request<T>(endpoint, {
+  async put<T>(url: string, data?: any): Promise<T> {
+    return this.request<T>(url, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
+  async delete<T>(url: string): Promise<T> {
+    return this.request<T>(url, { method: 'DELETE' });
   }
 }
 

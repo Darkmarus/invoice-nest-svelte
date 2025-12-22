@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { apiClient } from '../api/fetch_wrapper';
 
 export interface ConfigState {
@@ -19,11 +19,8 @@ export const loadConfig = async () => {
   if (loaded) return;
   configStore.set({ apiUrl: '', loading: true, error: null });
   try {
-    const res = await fetch('/config.json');
-    if (!res.ok) throw new Error('Config not found');
-    const { apiUrl } = await res.json();
+    const { apiUrl } = await apiClient.get<{ apiUrl: string }>('/config.json');
     configStore.set({ apiUrl, loading: false, error: null });
-    apiClient.setBaseURL(apiUrl);
     loaded = true;
   } catch (e) {
     configStore.set({
@@ -32,4 +29,8 @@ export const loadConfig = async () => {
       error: e instanceof Error ? e.message : 'Config error',
     });
   }
+};
+
+export const apiUrl = (): string => {
+  return get(configStore).apiUrl;
 };

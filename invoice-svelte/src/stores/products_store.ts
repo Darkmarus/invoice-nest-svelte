@@ -1,6 +1,5 @@
-// src/stores/products_store.ts
 import { writable } from 'svelte/store';
-import { createProduct, getProducts } from '../api/products';
+import { productApiService } from '../api/products_api';
 import type { CreateProductRequest } from '../models/product_request';
 import type { ProductResponse, ProductsResponse } from '../models/product_response';
 
@@ -32,7 +31,7 @@ function createProductsStore() {
     currentParams = params;
     update((state) => ({ ...state, loading: true, error: null }));
     try {
-      const response: ProductsResponse = await getProducts(params);
+      const response: ProductsResponse = await productApiService.fetchProducts(params);
       set({
         data: response.data,
         loading: false,
@@ -56,7 +55,7 @@ function createProductsStore() {
     fetch: fetchData,
     create: async (data: CreateProductRequest) => {
       try {
-        await createProduct(data);
+        await productApiService.createProduct(data);
         await fetchData(currentParams);
       } catch (error) {
         throw error;

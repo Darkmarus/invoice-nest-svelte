@@ -6,7 +6,6 @@
   import ProductForm from '../components/product_form.svelte';
   import { productsStore } from '../stores/products_store';
 
-
   let showModal = $state(false);
   let searchValue = $state('');
   let newProduct = $state({

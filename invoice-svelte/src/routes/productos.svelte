@@ -4,41 +4,42 @@
   import ProductTable from '../components/product_table.svelte';
   import ProductCards from '../components/product_cards.svelte';
   import ProductForm from '../components/product_form.svelte';
+  import { productsStore } from '../stores/products_store';
+
 
   let showModal = $state(false);
   let searchValue = $state('');
-  let categoryValue = $state('');
   let newProduct = $state({
     name: '',
     price: 0,
-    category: '',
-    description: '',
+    stock: 0,
   });
 
-  let products = $state([
-    {
-      id: 1,
-      name: 'Laptop Pro',
-      price: 1299.99,
-      category: 'Electrónica',
-      description: 'Laptop de alto rendimiento para profesionales',
-      stock: 15,
-    },
-    {
-      id: 2,
-      name: 'Mouse Inalámbrico',
-      price: 29.99,
-      category: 'Accesorios',
-      description: 'Mouse ergonómico con conexión Bluetooth',
-      stock: 50,
-    },
-  ]);
+  // Reactive effect for search changes
+  $effect(() => {
+    productsStore.fetch({
+      page: 1,
+      limit: 10,
+      name: searchValue || undefined,
+    });
+  });
 
-  function handleSave() {
-    console.log('Nuevo producto:', newProduct);
-    // Reset form
-    newProduct = { name: '', price: 0, category: '', description: '' };
-    showModal = false;
+  async function handleSave() {
+    try {
+      await productsStore.create(newProduct);
+      newProduct = { name: '', price: 0, stock: 0 };
+      showModal = false;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function goToPage(page: number) {
+    productsStore.fetch({
+      page,
+      limit: 10,
+      name: searchValue || undefined,
+    });
   }
 </script>
 
@@ -50,17 +51,55 @@
     </div>
   </div>
 
-  <ProductFilters bind:searchValue bind:categoryValue />
+  <ProductFilters bind:searchValue />
 
-  <!-- Table view for desktop -->
-  <div class="hidden md:block">
-    <ProductTable {products} />
-  </div>
+  {#if $productsStore.loading}
+    <div class="flex justify-center">
+      <span class="loading loading-spinner loading-lg"></span>
+    </div>
+  {:else if $productsStore.error}
+    <div class="alert alert-error">
+      <span>{$productsStore.error}</span>
+    </div>
+  {:else}
+    <!-- Table view for desktop -->
+    <div class="hidden md:block">
+      <ProductTable products={$productsStore.data} />
+    </div>
 
-  <!-- Card view for mobile -->
-  <div class="block md:hidden">
-    <ProductCards {products} />
-  </div>
+    <!-- Card view for mobile -->
+    <div class="block md:hidden">
+      <ProductCards products={$productsStore.data} />
+    </div>
+
+    <!-- Pagination -->
+    {#if $productsStore.totalPages > 1}
+      <div class="flex justify-center mt-8">
+        <div class="join">
+          <button
+            class="join-item btn"
+            disabled={$productsStore.page === 1}
+            onclick={() => goToPage($productsStore.page - 1)}>
+            «
+          </button>
+          {#each Array($productsStore.totalPages) as _, i}
+            <button
+              class="join-item btn"
+              class:btn-active={$productsStore.page === i + 1}
+              onclick={() => goToPage(i + 1)}>
+              {i + 1}
+            </button>
+          {/each}
+          <button
+            class="join-item btn"
+            disabled={$productsStore.page === $productsStore.totalPages}
+            onclick={() => goToPage($productsStore.page + 1)}>
+            »
+          </button>
+        </div>
+      </div>
+    {/if}
+  {/if}
 
   <FormModal
     bind:isOpen={showModal}
@@ -69,6 +108,6 @@
     cancelText="Cancelar"
     onConfirm={handleSave}
     onCancel={() => (showModal = false)}>
-    <ProductForm bind:newProduct onSubmit={handleSave} />
+    <ProductForm bind:newProduct />
   </FormModal>
 </div>

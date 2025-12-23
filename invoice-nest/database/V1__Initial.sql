@@ -18,6 +18,7 @@ CREATE TABLE products(
     "name" varchar(120) NULL,
     stock int4 NULL,
     price numeric(15, 2) NULL,
+    details varchar(255) NULL,
     "enabled" boolean NULL,
     created_at timestamp with time zone NULL,
     updated_at timestamp with time zone NULL

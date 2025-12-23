@@ -6,7 +6,6 @@
   <table class="table table-zebra w-full">
     <thead>
       <tr>
-        <th>ID</th>
         <th>Nombre</th>
         <th>Precio</th>
         <th>Categoría</th>
@@ -17,7 +16,6 @@
     <tbody>
       {#each products as product (product.id)}
         <tr>
-          <td>{product.id}</td>
           <td>
             <div>
               <div class="font-bold">{product.name}</div>

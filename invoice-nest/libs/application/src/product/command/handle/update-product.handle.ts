@@ -19,19 +19,22 @@ export class UpdateProductHandler implements ICommandHandler<
     }
 
     if (command.name !== undefined) {
-      existingProduct._name = command.name;
+      existingProduct.name = command.name;
+    }
+    if (command.details !== undefined) {
+      existingProduct.details = command.details;
     }
     if (command.price !== undefined) {
-      existingProduct._price = command.price;
+      existingProduct.price = command.price;
     }
     if (command.stock !== undefined) {
-      existingProduct._stock = command.stock;
+      existingProduct.stock = command.stock;
     }
     if (command.enabled !== undefined) {
-      existingProduct._enabled = command.enabled;
+      existingProduct.enabled = command.enabled;
     }
 
-    existingProduct._updated_at = new Date();
+    existingProduct.updated_at = new Date();
 
     return await this.productRepository.update(existingProduct);
   }

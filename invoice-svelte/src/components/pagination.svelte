@@ -8,14 +8,7 @@
     onPageChange: (page: number) => void;
   }
 
-  let {
-    currentPage,
-    totalPages,
-    totalItems,
-    itemsPerPage,
-    itemName = 'items',
-    onPageChange
-  }: Props = $props();
+  let { currentPage, totalPages, totalItems, itemsPerPage, itemName = 'items', onPageChange }: Props = $props();
 
   function goToPage(page: number) {
     if (page >= 1 && page <= totalPages) {
@@ -101,7 +94,8 @@
   {#if totalItems !== undefined}
     <div class="text-center mt-4">
       <p class="text-sm text-base-content/60">
-        Mostrando {startIndex + 1}-{Math.min(endIndex, totalItems)} de {totalItems} {itemName}
+        Mostrando {startIndex + 1}-{Math.min(endIndex, totalItems)} de {totalItems}
+        {itemName}
       </p>
     </div>
   {/if}

@@ -1,16 +1,18 @@
 export class Product {
   private constructor(
-    public readonly _id: string | null,
-    public _name: string,
-    public _stock: number,
-    public _price: number,
-    public _enabled: boolean,
-    public readonly _created_at: Date,
-    public _updated_at: Date,
+    public readonly id: string | null,
+    public name: string,
+    public details: string,
+    public stock: number,
+    public price: number,
+    public enabled: boolean,
+    public readonly created_at: Date,
+    public updated_at: Date,
   ) {}
 
   public static create(props: {
     name: string;
+    details: string;
     price: number;
     stock: number;
   }): Product {
@@ -18,6 +20,7 @@ export class Product {
     return new Product(
       null,
       props.name,
+      props.details,
       props.stock,
       props.price,
       false,
@@ -29,6 +32,7 @@ export class Product {
   public static rehydrate(props: {
     id: string;
     name: string;
+    details: string;
     price: number;
     stock: number;
     enabled: boolean;
@@ -38,8 +42,9 @@ export class Product {
     return new Product(
       props.id,
       props.name,
-      props.price,
+      props.details,
       props.stock,
+      props.price,
       props.enabled,
       props.created_at,
       props.updated_at,

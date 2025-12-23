@@ -10,13 +10,14 @@ import type { UpdateProductDto } from '../dto/update-product.dto';
 export class ProductMapper {
   static toResponse(product: Product): ProductResponseDto {
     return {
-      id: product._id ?? '',
-      name: product._name,
-      stock: product._stock,
-      price: product._price,
-      enabled: product._enabled,
-      created_at: product._created_at,
-      updated_at: product._updated_at,
+      id: product.id ?? '',
+      name: product.name,
+      details: product.details,
+      stock: product.stock,
+      price: product.price,
+      enabled: product.enabled,
+      created_at: product.created_at,
+      updated_at: product.updated_at,
     };
   }
 
@@ -25,6 +26,7 @@ export class ProductMapper {
   ): CreateProductCommand {
     return new CreateProductCommand(
       createProductDto.name,
+      createProductDto.details,
       createProductDto.price,
       createProductDto.stock,
     );
@@ -36,6 +38,7 @@ export class ProductMapper {
     return new UpdateProductCommand(
       id,
       updateProductDto.name,
+      updateProductDto.details,
       updateProductDto.price,
       updateProductDto.stock,
       updateProductDto.enabled,

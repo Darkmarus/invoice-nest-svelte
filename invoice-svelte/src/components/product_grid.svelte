@@ -126,21 +126,20 @@
   }
 </script>
 
-<section class="py-8">
-  <div class="container mx-auto px-4">
+<section class="">
+  <div class="container mx-auto">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {#each products as product (product.id)}
         <ProductCard {product} />
       {/each}
     </div>
 
-     <Pagination
-       {currentPage}
-       {totalPages}
-       totalItems={allProducts.length}
-       itemsPerPage={itemsPerPage}
-       itemName="productos"
-       onPageChange={handlePageChange}
-     />
+    <Pagination
+      {currentPage}
+      {totalPages}
+      totalItems={allProducts.length}
+      {itemsPerPage}
+      itemName="productos"
+      onPageChange={handlePageChange} />
   </div>
 </section>

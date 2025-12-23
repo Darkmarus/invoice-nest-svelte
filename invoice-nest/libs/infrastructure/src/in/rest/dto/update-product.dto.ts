@@ -1,14 +1,23 @@
-import {
-  IsString,
-  IsNumber,
-  IsBoolean,
-  Min,
-  MaxLength,
-  IsOptional,
-} from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsBoolean,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class UpdateProductDto {
+  @ApiPropertyOptional({
+    description: 'Nombre del producto',
+    example: 'Laptop Dell XPS 15',
+    maxLength: 120,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  name?: string;
   @ApiPropertyOptional({
     description: 'Nombre del producto',
     example: 'Laptop Dell XPS 15',
@@ -17,7 +26,7 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  name?: string;
+  details?: string;
 
   @ApiPropertyOptional({
     description: 'Precio del producto',

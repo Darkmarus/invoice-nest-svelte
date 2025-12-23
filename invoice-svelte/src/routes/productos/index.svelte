@@ -1,18 +1,11 @@
 <script lang="ts">
-  import FormModal from '../components/form_modal.svelte';
-  import ProductFilters from '../components/product_filters.svelte';
-  import ProductTable from '../components/product_table.svelte';
-  import ProductCards from '../components/product_cards.svelte';
-  import ProductForm from '../components/product_form.svelte';
-  import { productsStore } from '../stores/products_store';
+  import ProductFilters from '../../components/product_filters.svelte';
+  import ProductTable from '../../components/product_table.svelte';
+  import ProductCards from '../../components/product_cards.svelte';
+  import { productsStore } from '../../stores/products_store';
+  import { navigate } from 'sv-router/generated';
 
-  let showModal = $state(false);
   let searchValue = $state('');
-  let newProduct = $state({
-    name: '',
-    price: 0,
-    stock: 0,
-  });
 
   // Reactive effect for search changes
   $effect(() => {
@@ -23,14 +16,8 @@
     });
   });
 
-  async function handleSave() {
-    try {
-      await productsStore.create(newProduct);
-      newProduct = { name: '', price: 0, stock: 0 };
-      showModal = false;
-    } catch (err) {
-      console.error(err);
-    }
+  function goToCreate() {
+    navigate('/productos/crear');
   }
 
   function goToPage(page: number) {
@@ -46,7 +33,7 @@
   <div class="mb-6">
     <div class="flex justify-between items-center">
       <h1 class="text-2xl md:text-3xl font-bold text-base-content">Gestión de Productos</h1>
-      <button class="btn btn-primary btn-sm md:btn" onclick={() => (showModal = true)}> Nuevo Producto </button>
+      <button class="btn btn-primary btn-sm md:btn" onclick={goToCreate}> Nuevo Producto </button>
     </div>
   </div>
 
@@ -99,14 +86,4 @@
       </div>
     {/if}
   {/if}
-
-  <FormModal
-    bind:isOpen={showModal}
-    title="Nuevo Producto"
-    confirmText="Crear"
-    cancelText="Cancelar"
-    onConfirm={handleSave}
-    onCancel={() => (showModal = false)}>
-    <ProductForm bind:newProduct />
-  </FormModal>
 </div>

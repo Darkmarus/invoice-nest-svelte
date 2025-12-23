@@ -14,6 +14,12 @@ export class ProductResponseDto {
   name: string;
 
   @ApiProperty({
+    description: 'descripción del producto',
+    example: 'Aparato electrodoméstico',
+  })
+  details: string;
+
+  @ApiProperty({
     description: 'Cantidad en stock',
     example: 50,
   })

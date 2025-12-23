@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Product } from '@app/domain/models/product.model';
 import type {
   PaginatedResult,
@@ -16,21 +18,23 @@ export class ProductRepositoryImpl implements ProductRepository {
   async save(product: Product): Promise<Product> {
     const [saved] = await this.knex('products')
       .insert({
-        name: product._name,
-        stock: product._stock,
-        price: product._price,
-        enabled: product._enabled,
-        created_at: product._created_at,
-        updated_at: product._updated_at,
+        name: product.name,
+        details: product.details,
+        stock: product.stock,
+        price: product.price,
+        enabled: product.enabled,
+        created_at: product.created_at,
+        updated_at: product.updated_at,
       })
       .returning('*');
 
     return Product.rehydrate({
-      id: saved.id,
-      name: saved.name,
+      id: saved.id as string,
+      name: saved.name as string,
+      details: saved.details as string,
       price: parseFloat(saved.price),
-      stock: saved.stock,
-      enabled: saved.enabled,
+      stock: saved.stock as number,
+      enabled: saved.enabled as boolean,
       created_at: new Date(saved.created_at),
       updated_at: new Date(saved.updated_at),
     });
@@ -44,11 +48,12 @@ export class ProductRepositoryImpl implements ProductRepository {
     }
 
     return Product.rehydrate({
-      id: result.id,
-      name: result.name,
+      id: result.id as string,
+      name: result.name as string,
+      details: result.details as string,
       price: parseFloat(result.price),
-      stock: result.stock,
-      enabled: result.enabled,
+      stock: result.stock as number,
+      enabled: result.enabled as boolean,
       created_at: new Date(result.created_at),
       updated_at: new Date(result.updated_at),
     });
@@ -61,6 +66,7 @@ export class ProductRepositoryImpl implements ProductRepository {
       Product.rehydrate({
         id: result.id,
         name: result.name,
+        details: result.details,
         price: parseFloat(result.price),
         stock: result.stock,
         enabled: result.enabled,
@@ -113,6 +119,7 @@ export class ProductRepositoryImpl implements ProductRepository {
       Product.rehydrate({
         id: result.id,
         name: result.name,
+        details: result.details,
         price: parseFloat(result.price),
         stock: result.stock,
         enabled: result.enabled,
@@ -135,22 +142,24 @@ export class ProductRepositoryImpl implements ProductRepository {
   async update(product: Product): Promise<Product> {
     const updated_at = new Date();
     const [updated] = await this.knex('products')
-      .where({ id: product._id })
+      .where({ id: product.id })
       .update({
-        name: product._name,
-        stock: product._stock,
-        price: product._price,
-        enabled: product._enabled,
+        name: product.name,
+        stock: product.stock,
+        details: product.details,
+        price: product.price,
+        enabled: product.enabled,
         updated_at,
       })
       .returning('*');
 
     return Product.rehydrate({
-      id: updated.id,
-      name: updated.name,
+      id: updated.id as string,
+      name: updated.name as string,
+      details: updated.details as string,
       price: parseFloat(updated.price),
-      stock: updated.stock,
-      enabled: updated.enabled,
+      stock: updated.stock as number,
+      enabled: updated.enabled as boolean,
       created_at: new Date(updated.created_at),
       updated_at: new Date(updated.updated_at),
     });

@@ -43,9 +43,8 @@ async function bootstrap() {
   logger.log(`Swagger documentation: http://localhost:${port}/api`);
 
   if (module.hot) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     module.hot.accept();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+
     module.hot.dispose(() => app.close());
   }
 }

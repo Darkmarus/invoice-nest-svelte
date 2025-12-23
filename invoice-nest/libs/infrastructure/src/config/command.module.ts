@@ -1,3 +1,5 @@
+import { UploadFileCommand } from '@app/application/file/command/upload-file.command';
+import { UploadFileHandler } from '@app/application/file/command/handle/upload-file.handle';
 import { CreateProductCommand } from '@app/application/product/command/create-product.command';
 import { DeleteProductCommand } from '@app/application/product/command/delete-product.command';
 import { CreateProductHandler } from '@app/application/product/command/handle/create-product.handle';
@@ -8,8 +10,10 @@ import { GetAllProductsQuery } from '@app/application/product/query/get-all-prod
 import { GetProductByIdQuery } from '@app/application/product/query/get-product-by-id.query';
 import { GetAllProductsHandler } from '@app/application/product/query/handle/get-all-products.handle';
 import { GetProductByIdHandler } from '@app/application/product/query/handle/get-product-by-id.handle';
+import { FileRepository } from '@app/domain/repositories/file.repository';
 import { ProductRepository } from '@app/domain/repositories/product.repository';
 import { HandlerRegistryService } from '@app/infrastructure/config/handler-registry.service';
+import { FileStorageService } from '@app/infrastructure/out/storage/file-storage.service';
 import { PersistenceModule } from '@app/infrastructure/out/persistence/persistence.module';
 import { Module, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
@@ -45,6 +49,12 @@ import { CommandBus } from './command-bus.service';
       useFactory: (repo: ProductRepository) => new GetAllProductsHandler(repo),
       inject: [ProductRepository],
     },
+    {
+      provide: UploadFileHandler,
+      useFactory: (repo: FileRepository, storage: FileStorageService) =>
+        new UploadFileHandler(repo, storage),
+      inject: [FileRepository, FileStorageService],
+    },
   ],
   exports: [CommandBus],
 })
@@ -63,6 +73,7 @@ export class CommandModule implements OnModuleInit {
       { command: DeleteProductCommand, handler: DeleteProductHandler },
       { command: GetAllProductsQuery, handler: GetAllProductsHandler },
       { command: GetProductByIdQuery, handler: GetProductByIdHandler },
+      { command: UploadFileCommand, handler: UploadFileHandler },
     ];
 
     this.handlerRegistry.autoRegisterModuleHandlers(

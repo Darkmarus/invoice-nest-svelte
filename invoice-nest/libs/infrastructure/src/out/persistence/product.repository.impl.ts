@@ -15,8 +15,9 @@ import { InjectModel } from 'nest-knexjs';
 export class ProductRepositoryImpl implements ProductRepository {
   constructor(@InjectModel() private readonly knex: Knex) {}
 
-  async save(product: Product): Promise<Product> {
-    const [saved] = await this.knex('products')
+  async save(product: Product, trx?: Knex.Transaction): Promise<Product> {
+    const db = trx || this.knex;
+    const [saved] = await db('products')
       .insert({
         name: product.name,
         details: product.details,

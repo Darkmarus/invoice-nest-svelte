@@ -6,7 +6,7 @@ import type {
 } from './product-filters.interface';
 
 export abstract class ProductRepository {
-  abstract save(product: Product): Promise<Product>;
+  abstract save(product: Product, trx?: any): Promise<Product>;
   abstract findById(id: string): Promise<Product | null>;
   abstract findAll(): Promise<Product[]>;
   abstract findWithFilters(

@@ -84,6 +84,14 @@ export class ApiClient {
     });
   }
 
+  async postForm<T>(url: string, formData: FormData): Promise<[ApiError | null, T | null]> {
+    return this.request<T>(url, {
+      method: 'POST',
+      body: formData,
+      headers: {}, // Let browser set Content-Type for multipart
+    });
+  }
+
   async delete<T>(url: string): Promise<[ApiError | null, T | null]> {
     return this.request<T>(url, { method: 'DELETE' });
   }

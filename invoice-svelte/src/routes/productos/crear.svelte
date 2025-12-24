@@ -8,12 +8,13 @@
     price: 0,
     stock: 0,
     details: '',
+    images: [] as File[],
   });
 
   async function handleSave() {
     try {
       await productsStore.create(newProduct);
-      newProduct = { name: '', price: 0, stock: 0, details: '' };
+      newProduct = { name: '', price: 0, stock: 0, details: '', images: [] as File[] };
       navigate('/productos');
     } catch (err) {
       console.error(err);

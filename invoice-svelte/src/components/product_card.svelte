@@ -28,7 +28,7 @@
     <h2 class="card-title text-lg font-bold">{product.name}</h2>
     <p class="text-sm text-base-content/70">{product.description}</p>
     <div class="flex items-center justify-between">
-      <span class="text-2xl font-bold text-primary">${product.price.toFixed(2)}</span>
+      <span class="text-2xl font-bold text-primary">${(product.price ?? 0).toFixed(2)}</span>
       <div class="badge badge-outline">{product.category}</div>
     </div>
     <div class="card-actions flex flex-col sm:flex-row justify-end gap-2 mt-4">

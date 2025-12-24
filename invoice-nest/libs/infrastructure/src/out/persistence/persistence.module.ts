@@ -1,11 +1,15 @@
 import { FileRepository } from '@app/domain/repositories/file.repository';
+import { ImageProductRepository } from '@app/domain/repositories/image-product.repository';
 import { ProductRepository } from '@app/domain/repositories/product.repository';
+import { UnitOfWork } from '@app/domain/repositories/unit-of-work.interface';
 import { FileStorageService } from '@app/infrastructure/out/storage/file-storage.service';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { KnexModule } from 'nest-knexjs';
 import { FileRepositoryImpl } from './file.repository.impl';
+import { ImageProductRepositoryImpl } from './image-product.repository.impl';
 import { ProductRepositoryImpl } from './product.repository.impl';
+import { UnitOfWorkImpl } from './unit-of-work.impl';
 
 @Module({
   imports: [
@@ -39,8 +43,22 @@ import { ProductRepositoryImpl } from './product.repository.impl';
       provide: FileRepository,
       useClass: FileRepositoryImpl,
     },
+    {
+      provide: ImageProductRepository,
+      useClass: ImageProductRepositoryImpl,
+    },
+    {
+      provide: UnitOfWork,
+      useClass: UnitOfWorkImpl,
+    },
     FileStorageService,
   ],
-  exports: [ProductRepository, FileRepository, FileStorageService],
+  exports: [
+    ProductRepository,
+    FileRepository,
+    ImageProductRepository,
+    UnitOfWork,
+    FileStorageService,
+  ],
 })
 export class PersistenceModule {}

@@ -18,7 +18,20 @@ export class ProductApiService {
   }
 
   async createProduct(data: CreateProductRequest): Promise<[ApiError | null, void | null]> {
-    return apiClient.post<void>(`${apiUrl()}/products`, data);
+    const formData = new FormData();
+    const productBody = {
+      name: data.name,
+      details: data.details,
+      price: data.price,
+      stock: data.stock,
+    };
+    formData.append('body', JSON.stringify(productBody));
+    if (data.images) {
+      data.images.forEach((file, index) => {
+        formData.append('files', file);
+      });
+    }
+    return apiClient.postForm<void>(`${apiUrl()}/products`, formData);
   }
 
   async fetchProduct(id: string): Promise<[ApiError | null, ProductResponse | null]> {

@@ -48,4 +48,11 @@ export class ProductResponseDto {
     example: '2024-01-20T14:45:00Z',
   })
   updated_at: Date;
+
+  @ApiProperty({
+    description: 'Lista de rutas de las imágenes del producto',
+    example: ['/uploads/image1.jpg', '/uploads/image2.png'],
+    type: [String],
+  })
+  images: string[];
 }

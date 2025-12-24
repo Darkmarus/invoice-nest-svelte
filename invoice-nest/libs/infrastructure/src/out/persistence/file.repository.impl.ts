@@ -10,8 +10,9 @@ import { InjectModel } from 'nest-knexjs';
 export class FileRepositoryImpl implements FileRepository {
   constructor(@InjectModel() private readonly knex: Knex) {}
 
-  async save(file: File): Promise<File> {
-    const [saved] = await this.knex('files')
+  async save(file: File, trx?: Knex.Transaction): Promise<File> {
+    const db = trx || this.knex;
+    const [saved] = await db('files')
       .insert({
         name: file.name,
         path: file.path,

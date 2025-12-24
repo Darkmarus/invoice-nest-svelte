@@ -1,8 +1,8 @@
 import { UploadFileCommand } from '@app/application/file/command/upload-file.command';
 import { UploadFileHandler } from '@app/application/file/command/handle/upload-file.handle';
-import { CreateProductCommand } from '@app/application/product/command/create-product.command';
+import { CreateProductWithFilesCommand } from '@app/application/product/command/create-product-with-files.command';
 import { DeleteProductCommand } from '@app/application/product/command/delete-product.command';
-import { CreateProductHandler } from '@app/application/product/command/handle/create-product.handle';
+import { CreateProductWithFilesHandler } from '@app/application/product/command/handle/create-product-with-files.handle';
 import { DeleteProductHandler } from '@app/application/product/command/handle/delete-product.handle';
 import { UpdateProductHandler } from '@app/application/product/command/handle/update-product.handle';
 import { UpdateProductCommand } from '@app/application/product/command/update-product.command';
@@ -11,6 +11,7 @@ import { GetProductByIdQuery } from '@app/application/product/query/get-product-
 import { GetAllProductsHandler } from '@app/application/product/query/handle/get-all-products.handle';
 import { GetProductByIdHandler } from '@app/application/product/query/handle/get-product-by-id.handle';
 import { FileRepository } from '@app/domain/repositories/file.repository';
+import { ImageProductRepository } from '@app/domain/repositories/image-product.repository';
 import { ProductRepository } from '@app/domain/repositories/product.repository';
 import { HandlerRegistryService } from '@app/infrastructure/config/handler-registry.service';
 import { FileStorageService } from '@app/infrastructure/out/storage/file-storage.service';
@@ -25,9 +26,8 @@ import { CommandBus } from './command-bus.service';
     HandlerRegistryService,
     CommandBus,
     {
-      provide: CreateProductHandler,
-      useFactory: (repo: ProductRepository) => new CreateProductHandler(repo),
-      inject: [ProductRepository],
+      provide: CreateProductWithFilesHandler,
+      useClass: CreateProductWithFilesHandler,
     },
     {
       provide: UpdateProductHandler,
@@ -41,13 +41,21 @@ import { CommandBus } from './command-bus.service';
     },
     {
       provide: GetProductByIdHandler,
-      useFactory: (repo: ProductRepository) => new GetProductByIdHandler(repo),
-      inject: [ProductRepository],
+      useFactory: (
+        productRepo: ProductRepository,
+        imageProductRepo: ImageProductRepository,
+        fileRepo: FileRepository,
+      ) => new GetProductByIdHandler(productRepo, imageProductRepo, fileRepo),
+      inject: [ProductRepository, ImageProductRepository, FileRepository],
     },
     {
       provide: GetAllProductsHandler,
-      useFactory: (repo: ProductRepository) => new GetAllProductsHandler(repo),
-      inject: [ProductRepository],
+      useFactory: (
+        productRepo: ProductRepository,
+        imageProductRepo: ImageProductRepository,
+        fileRepo: FileRepository,
+      ) => new GetAllProductsHandler(productRepo, imageProductRepo, fileRepo),
+      inject: [ProductRepository, ImageProductRepository, FileRepository],
     },
     {
       provide: UploadFileHandler,
@@ -68,7 +76,10 @@ export class CommandModule implements OnModuleInit {
     // Auto-registro automático de todos los handlers del módulo
     // Solo necesitas agregar el handler aquí y en providers, el resto es automático
     const handlerBindings = [
-      { command: CreateProductCommand, handler: CreateProductHandler },
+      {
+        command: CreateProductWithFilesCommand,
+        handler: CreateProductWithFilesHandler,
+      },
       { command: UpdateProductCommand, handler: UpdateProductHandler },
       { command: DeleteProductCommand, handler: DeleteProductHandler },
       { command: GetAllProductsQuery, handler: GetAllProductsHandler },

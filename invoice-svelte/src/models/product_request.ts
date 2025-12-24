@@ -3,6 +3,8 @@ export interface CreateProductRequest {
   name: string;
   price: number;
   stock: number;
+  details: string;
+  images?: File[];
 }
 
 export interface UpdateProductRequest {

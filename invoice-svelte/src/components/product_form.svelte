@@ -1,76 +1,26 @@
 <script lang="ts">
-  import Cropper from 'svelte-easy-crop';
-  import { createEventDispatcher } from 'svelte';
+   import { createEventDispatcher } from 'svelte';
 
-  let { newProduct = $bindable({ name: '', price: 0, stock: 0, details: '', images: [] as string[] }) } = $props();
+   let { newProduct = $bindable({ name: '', price: 0, stock: 0, details: '', images: [] as File[] }) } = $props();
 
-  let images = $state<string[]>([]);
-  let currentImage = $state<string | null>(null);
-  let crop = $state({ x: 0, y: 0 });
-  let zoom = $state(1);
-  let showCropper = $state(false);
-  const dispatch = createEventDispatcher();
+   let images = $state<File[]>([]);
+   const dispatch = createEventDispatcher();
 
-  function handleImageUpload(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const file = target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        currentImage = e.target?.result as string;
-        showCropper = true;
-      };
-      reader.readAsDataURL(file);
-    }
-  }
+   function handleImageUpload(event: Event) {
+     const target = event.target as HTMLInputElement;
+     const files = target.files;
+     if (files) {
+       for (let file of Array.from(files)) {
+         images = [...images, file];
+       }
+       newProduct.images = images;
+     }
+   }
 
-  async function cropImage() {
-    if (!currentImage) return;
-
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const image = new Image();
-    image.src = currentImage;
-
-    await new Promise((resolve) => {
-      image.onload = resolve;
-    });
-
-    canvas.width = 300;
-    canvas.height = 200;
-
-    // Draw the image maintaining aspect ratio, centered
-    const imgAspect = image.width / image.height;
-    const canvasAspect = 300 / 200;
-    let drawWidth, drawHeight, offsetX, offsetY;
-
-    if (imgAspect > canvasAspect) {
-      // Image is wider, fit height
-      drawHeight = 200;
-      drawWidth = drawHeight * imgAspect;
-      offsetX = (300 - drawWidth) / 2;
-      offsetY = 0;
-    } else {
-      // Image is taller, fit width
-      drawWidth = 300;
-      drawHeight = drawWidth / imgAspect;
-      offsetX = 0;
-      offsetY = (200 - drawHeight) / 2;
-    }
-
-    ctx?.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
-
-    const croppedImage = canvas.toDataURL('image/jpeg', 0.9);
-    images = [...images, croppedImage];
-    newProduct.images = images;
-    currentImage = null;
-    showCropper = false;
-  }
-
-  function removeImage(index: number) {
-    images = images.filter((_, i) => i !== index);
-    newProduct.images = images;
-  }
+   function removeImage(index: number) {
+     images = images.filter((_, i) => i !== index);
+     newProduct.images = images;
+   }
 </script>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -154,15 +104,16 @@
     <label class="label" for="images">
       <span class="label-text font-semibold">Imágenes del Producto</span>
     </label>
-    <div class="flex-col items-center gap-4">
-      <input
-        id="images"
-        type="file"
-        accept="image/*"
-        class="file-input file-input-bordered file-input-primary"
-        onchange={handleImageUpload} />
-      <div class="text-sm opacity-70">Selecciona una imagen para recortar y agregar</div>
-    </div>
+     <div class="flex-col items-center gap-4">
+       <input
+         id="images"
+         type="file"
+         accept="image/*"
+         multiple
+         class="file-input file-input-bordered file-input-primary"
+         onchange={handleImageUpload} />
+       <div class="text-sm opacity-70">Selecciona imágenes para agregar</div>
+     </div>
 
     {#if images.length > 0}
       <div class="mt-4">
@@ -171,7 +122,7 @@
           {#each images as image, index}
             <div class="card bg-base-200">
               <figure class="px-4 pt-4">
-                <img src={image} alt="Producto {index + 1}" class="w-full h-24 object-cover rounded" />
+                 <img src={URL.createObjectURL(image)} alt="Producto {index + 1}" class="w-full h-24 object-cover rounded" />
               </figure>
               <div class="card-body p-2">
                 <div class="card-actions justify-end">
@@ -194,23 +145,5 @@
     {/if}
   </div>
 
-  {#if showCropper && currentImage}
-    <div class="modal modal-open">
-      <div class="modal-box max-w-2xl">
-        <h3 class="font-bold text-lg mb-4">Recortar Imagen</h3>
-        <div class="relative h-96">
-          <Cropper image={currentImage} bind:crop bind:zoom aspect={1.5} />
-        </div>
-        <div class="modal-action">
-          <button
-            class="btn btn-ghost"
-            onclick={() => {
-              showCropper = false;
-              currentImage = null;
-            }}>Cancelar</button>
-          <button class="btn btn-primary" onclick={cropImage}>Recortar y Agregar</button>
-        </div>
-      </div>
-    </div>
-  {/if}
+
 </div>

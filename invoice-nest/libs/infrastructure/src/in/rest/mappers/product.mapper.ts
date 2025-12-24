@@ -1,4 +1,3 @@
-import { CreateProductCommand } from '@app/application/product/command/create-product.command';
 import { DeleteProductCommand } from '@app/application/product/command/delete-product.command';
 import { UpdateProductCommand } from '@app/application/product/command/update-product.command';
 import { GetProductByIdQuery } from '@app/application/product/query/get-product-by-id.query';
@@ -8,7 +7,10 @@ import { ProductResponseDto } from '../dto/product-response.dto';
 import type { UpdateProductDto } from '../dto/update-product.dto';
 
 export class ProductMapper {
-  static toResponse(product: Product): ProductResponseDto {
+  static toResponse(
+    product: Product,
+    images: string[] = [],
+  ): ProductResponseDto {
     return {
       id: product.id ?? '',
       name: product.name,
@@ -18,19 +20,10 @@ export class ProductMapper {
       enabled: product.enabled,
       created_at: product.created_at,
       updated_at: product.updated_at,
+      images,
     };
   }
 
-  static toCreateCommand(
-    createProductDto: CreateProductDto,
-  ): CreateProductCommand {
-    return new CreateProductCommand(
-      createProductDto.name,
-      createProductDto.details,
-      createProductDto.price,
-      createProductDto.stock,
-    );
-  }
   static toUpdateCommand(
     id: string,
     updateProductDto: UpdateProductDto,

@@ -1,5 +1,7 @@
 <script lang="ts">
-  let { products } = $props<{ products: any[] }>();
+  import type { ProductResponse } from '../models/product_response';
+
+  let { products } = $props<{ products: ProductResponse[] }>();
 </script>
 
 <div class="space-y-4">

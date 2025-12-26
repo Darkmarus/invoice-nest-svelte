@@ -1,11 +1,6 @@
-FROM node:24-alpine AS base
+FROM invoice-nest-deps AS build
 
-ENV DIR /app
-
-WORKDIR $DIR
-
-
-FROM base AS build
+WORKDIR /app
 
 ENV CI=true
 
@@ -15,12 +10,13 @@ COPY nest-cli.json .
 COPY src src
 COPY libs libs
 
-RUN npm install && \
-    npm run build && \
+RUN npm run build && \
     npm prune --prod
 
 
-FROM base AS production
+FROM node:24-alpine AS production
+
+WORKDIR /app
 
 ENV NODE_ENV=production
 ENV USER=node

@@ -1,0 +1,11 @@
+FROM node:24-alpine AS deps
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm ci
+
+# Optionally, copy source and build, but for deps image, just deps
+# COPY . .
+# RUN npm run build

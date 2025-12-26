@@ -1,5 +1,7 @@
 <script lang="ts">
-  let { products } = $props<{ products: any[] }>();
+  import type { ProductResponse } from '../models/product_response';
+
+  let { products } = $props<{ products: ProductResponse[] }>();
 </script>
 
 <div class="overflow-x-auto">
@@ -22,13 +24,13 @@
               <div class="text-sm opacity-50">{product.description || 'Descripción del producto'}</div>
             </div>
           </td>
-           <td>${(product.price ?? 0).toFixed(2)}</td>
+          <td>${(product.price ?? 0).toFixed(2)}</td>
           <td>
             <span class="badge badge-outline">{product.category}</span>
           </td>
-           <td>
-             <span class="badge badge-success">{product.stock ?? 0}</span>
-           </td>
+          <td>
+            <span class="badge badge-success">{product.stock ?? 0}</span>
+          </td>
           <td>
             <div class="flex gap-2">
               <button class="btn btn-sm btn-primary">Editar</button>

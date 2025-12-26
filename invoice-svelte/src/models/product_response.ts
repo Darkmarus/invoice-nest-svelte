@@ -7,6 +7,9 @@ export interface ProductResponse {
   enabled: boolean;
   created_at: string;
   updated_at: string;
+  description?: string;
+  category?: string;
+  images?: string[];
 }
 
 export interface ProductsResponse {

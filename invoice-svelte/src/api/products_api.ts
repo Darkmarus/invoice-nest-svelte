@@ -3,18 +3,20 @@ import type { ProductResponse, ProductsResponse } from '../models/product_respon
 import { apiUrl } from '../stores/config_store';
 import { apiClient, ApiError } from './fetch_wrapper';
 
+export interface ProductParams {
+  page?: number;
+  limit?: number;
+  name?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  enabled?: boolean;
+  sortBy?: 'name' | 'price' | 'stock' | 'created_at' | 'updated_at';
+  sortOrder?: 'ASC' | 'DESC';
+}
+
 export class ProductApiService {
-  async fetchProducts(params?: {
-    page?: number;
-    limit?: number;
-    name?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    enabled?: boolean;
-    sortBy?: 'name' | 'price' | 'stock' | 'created_at' | 'updated_at';
-    sortOrder?: 'ASC' | 'DESC';
-  }): Promise<[ApiError | null, ProductsResponse | null]> {
-    return apiClient.get<ProductsResponse>(`${apiUrl()}/products`, params);
+  async fetchProducts(params?: ProductParams): Promise<[ApiError | null, ProductsResponse | null]> {
+    return apiClient.get<ProductsResponse>(`${apiUrl()}/products`, {...params});
   }
 
   async createProduct(data: CreateProductRequest): Promise<[ApiError | null, void | null]> {

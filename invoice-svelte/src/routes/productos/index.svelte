@@ -1,11 +1,21 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import ProductFilters from '../../components/product_filters.svelte';
   import ProductTable from '../../components/product_table.svelte';
   import ProductCards from '../../components/product_cards.svelte';
+  import Pagination from '../../components/pagination.svelte';
   import { productsStore } from '../../stores/products_store';
   import { navigate } from 'sv-router/generated';
 
   let searchValue = $state('');
+
+  // Initial fetch
+  onMount(() => {
+    productsStore.fetch({
+      page: 1,
+      limit: 10,
+    });
+  });
 
   // Reactive effect for search changes
   $effect(() => {
@@ -58,32 +68,14 @@
       <ProductCards products={$productsStore.data} />
     </div>
 
-    <!-- Pagination -->
-    {#if $productsStore.totalPages > 1}
-      <div class="flex justify-center mt-8">
-        <div class="join">
-          <button
-            class="join-item btn"
-            disabled={$productsStore.page === 1}
-            onclick={() => goToPage($productsStore.page - 1)}>
-            «
-          </button>
-          {#each Array($productsStore.totalPages) as _, i}
-            <button
-              class="join-item btn"
-              class:btn-active={$productsStore.page === i + 1}
-              onclick={() => goToPage(i + 1)}>
-              {i + 1}
-            </button>
-          {/each}
-          <button
-            class="join-item btn"
-            disabled={$productsStore.page === $productsStore.totalPages}
-            onclick={() => goToPage($productsStore.page + 1)}>
-            »
-          </button>
-        </div>
-      </div>
-    {/if}
+     <!-- Pagination -->
+     <Pagination
+       currentPage={$productsStore.page}
+       totalPages={$productsStore.totalPages}
+       totalItems={$productsStore.total}
+       itemsPerPage={$productsStore.limit}
+       itemName="productos"
+       onPageChange={goToPage}
+     />
   {/if}
 </div>

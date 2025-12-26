@@ -6,6 +6,7 @@ import { FileStorageService } from '@app/infrastructure/out/storage/file-storage
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { KnexModule } from 'nest-knexjs';
+import { DatabaseHealthService } from './database-health.service';
 import { FileRepositoryImpl } from './file.repository.impl';
 import { ImageProductRepositoryImpl } from './image-product.repository.impl';
 import { ProductRepositoryImpl } from './product.repository.impl';
@@ -52,6 +53,7 @@ import { UnitOfWorkImpl } from './unit-of-work.impl';
       useClass: UnitOfWorkImpl,
     },
     FileStorageService,
+    DatabaseHealthService,
   ],
   exports: [
     ProductRepository,
@@ -59,6 +61,7 @@ import { UnitOfWorkImpl } from './unit-of-work.impl';
     ImageProductRepository,
     UnitOfWork,
     FileStorageService,
+    DatabaseHealthService,
   ],
 })
 export class PersistenceModule {}

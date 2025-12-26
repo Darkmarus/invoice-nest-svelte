@@ -70,14 +70,14 @@ export class ApiClient {
     return this.request<T>(fullUrl, { method: 'GET' });
   }
 
-  async post<T>(url: string, data?: any): Promise<[ApiError | null, T | null]> {
+  async post<T>(url: string, data?: unknown): Promise<[ApiError | null, T | null]> {
     return this.request<T>(url, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
-  async put<T>(url: string, data?: any): Promise<[ApiError | null, T | null]> {
+  async put<T>(url: string, data?: unknown): Promise<[ApiError | null, T | null]> {
     return this.request<T>(url, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,

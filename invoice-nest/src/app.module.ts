@@ -1,6 +1,8 @@
 import { RestModule } from '@app/infrastructure/in/rest/rest.module';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { staticFilesFactory } from '../libs/infrastructure/src/config/static-files.config';
 
 @Module({
   imports: [
@@ -9,6 +11,10 @@ import { ConfigModule } from '@nestjs/config';
       envFilePath: '.env',
     }),
     RestModule,
+    ServeStaticModule.forRootAsync({
+      useFactory: staticFilesFactory,
+      inject: [ConfigService],
+    }),
   ],
 })
 export class AppModule {}

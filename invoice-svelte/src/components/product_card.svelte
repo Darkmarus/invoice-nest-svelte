@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { apiUrl } from '../stores/config_store';
+
   let {
     product = {
-      id: 0,
+      id: '',
       name: '',
       price: 0,
       images: [] as string[],
@@ -9,18 +11,36 @@
       category: '',
     },
   } = $props();
+
+  const resolvedImages = (path: string) => `${apiUrl()}/${path}`;
+
+  let hash = $derived(() => {
+    let h = 0;
+    for (let c of product.id) h += c.charCodeAt(0);
+    return h % 360;
+  });
+
+  let placeholderColor = $derived(`hsl(${hash()}, 70%, 40%)`);
 </script>
 
 <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300">
   {#if product.images && product.images.length > 0}
     <figure class:hover-gallery={product.images.length != 1} class="px-4 pt-4">
-      {#each product.images as image}
-        <img src={image} alt={product.name} class="rounded-xl h-48 w-full object-cover" />
+      {#each product.images as imageUrl}
+        <img
+          src={resolvedImages(imageUrl)}
+          alt={product.name}
+          class="rounded-xl h-48 w-full object-cover"
+          onerror={(e) => ((e.target as HTMLImageElement).src = '/not_found.svg')} />
       {/each}
     </figure>
   {:else}
     <figure class="px-4 pt-4">
-      <img src={'https://placehold.co/300x200'} alt={product.name} class="rounded-xl h-48 w-full object-cover" />
+      <div
+        class="rounded-xl h-48 w-full flex items-center justify-center text-white text-2xl font-bold"
+        style:background-color={placeholderColor}>
+        {product.name}
+      </div>
     </figure>
   {/if}
 

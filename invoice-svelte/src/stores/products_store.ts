@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { productApiService } from '../api/products_api';
+import { productApiService, type ProductParams } from '../api/products_api';
 import type { CreateProductRequest } from '../models/product_request';
 import type { ProductResponse } from '../models/product_response';
 
@@ -25,9 +25,9 @@ const initialState: ProductsState = {
 
 function createProductsStore() {
   const { subscribe, set, update } = writable<ProductsState>(initialState);
-  let currentParams: any = {};
+  let currentParams: ProductParams = {};
 
-  const fetchData = async (params: any) => {
+  const fetchData = async (params: ProductParams) => {
     currentParams = params;
     update((state) => ({ ...state, loading: true, error: null }));
     const [err, response] = await productApiService.fetchProducts(params);

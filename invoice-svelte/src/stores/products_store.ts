@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { productApiService, type ProductParams } from '../api/products_api';
-import type { CreateProductRequest } from '../models/product_request';
+import type { CreateProductRequest, UpdateProductRequest } from '../models/product_request';
 import type { ProductResponse } from '../models/product_response';
 
 export interface ProductsState {
@@ -53,8 +53,29 @@ function createProductsStore() {
   return {
     subscribe,
     fetch: fetchData,
+    fetchProduct: async (id: string) => {
+      const [err, product] = await productApiService.fetchProduct(id);
+      if (err) {
+        throw new Error(err.message);
+      }
+      return product;
+    },
     create: async (data: CreateProductRequest) => {
       const [err] = await productApiService.createProduct(data);
+      if (err) {
+        throw new Error(err.message);
+      }
+      await fetchData(currentParams);
+    },
+    update: async (id: string, data: UpdateProductRequest) => {
+      const [err] = await productApiService.updateProduct(id, data);
+      if (err) {
+        throw new Error(err.message);
+      }
+      await fetchData(currentParams);
+    },
+    delete: async (id: string) => {
+      const [err] = await productApiService.deleteProduct(id);
       if (err) {
         throw new Error(err.message);
       }

@@ -2,6 +2,7 @@
 export interface ProductResponse {
   id: string;
   name: string;
+  details: string;
   stock: number;
   price: number;
   enabled: boolean;

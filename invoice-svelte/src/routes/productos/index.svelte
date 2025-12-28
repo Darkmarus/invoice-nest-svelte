@@ -1,11 +1,11 @@
 <script lang="ts">
+  import { navigate } from 'sv-router/generated';
   import { onMount } from 'svelte';
+  import Pagination from '../../components/pagination.svelte';
+  import ProductCards from '../../components/product_cards.svelte';
   import ProductFilters from '../../components/product_filters.svelte';
   import ProductTable from '../../components/product_table.svelte';
-  import ProductCards from '../../components/product_cards.svelte';
-  import Pagination from '../../components/pagination.svelte';
   import { productsStore } from '../../stores/products_store';
-  import { navigate } from 'sv-router/generated';
 
   let searchValue = $state('');
 
@@ -68,14 +68,13 @@
       <ProductCards products={$productsStore.data} />
     </div>
 
-     <!-- Pagination -->
-     <Pagination
-       currentPage={$productsStore.page}
-       totalPages={$productsStore.totalPages}
-       totalItems={$productsStore.total}
-       itemsPerPage={$productsStore.limit}
-       itemName="productos"
-       onPageChange={goToPage}
-     />
+    <!-- Pagination -->
+    <Pagination
+      currentPage={$productsStore.page}
+      totalPages={$productsStore.totalPages}
+      totalItems={$productsStore.total}
+      itemsPerPage={$productsStore.limit}
+      itemName="productos"
+      onPageChange={goToPage} />
   {/if}
 </div>

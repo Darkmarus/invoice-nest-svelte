@@ -34,3 +34,5 @@ export const loadConfig = async () => {
 export const apiUrl = (): string => {
   return get(configStore).apiUrl;
 };
+
+export const resolvedImages = (path: string) => `${apiUrl()}/${path}`;

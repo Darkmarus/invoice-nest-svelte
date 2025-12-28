@@ -16,7 +16,7 @@ export interface ProductParams {
 
 export class ProductApiService {
   async fetchProducts(params?: ProductParams): Promise<[ApiError | null, ProductsResponse | null]> {
-    return apiClient.get<ProductsResponse>(`${apiUrl()}/products`, {...params});
+    return apiClient.get<ProductsResponse>(`${apiUrl()}/products`, { ...params });
   }
 
   async createProduct(data: CreateProductRequest): Promise<[ApiError | null, void | null]> {

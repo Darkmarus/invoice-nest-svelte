@@ -16,7 +16,7 @@ export class DatabaseHealthService implements OnModuleInit {
       this.logger.error(`Failed to connect to database: ${error.message}`);
       throw new Error(
         `Cannot connect to PostgreSQL database at ${this.knex.client.config.connection.host}:${this.knex.client.config.connection.port}. ` +
-        'Please ensure the database is running and check your .env configuration.'
+          'Please ensure the database is running and check your .env configuration.',
       );
     }
   }

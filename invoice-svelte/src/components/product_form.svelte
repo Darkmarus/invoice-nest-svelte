@@ -1,34 +1,23 @@
 <script lang="ts">
-   import { createEventDispatcher } from 'svelte';
+  // Importa el componente para manejar imágenes del producto
+  import ProductImageManager from './product_image_manager.svelte';
 
-   let { newProduct = $bindable({ name: '', price: 0, stock: 0, details: '', images: [] as File[] }) } = $props();
-
-   let images = $state<File[]>([]);
-   const dispatch = createEventDispatcher();
-
-   function handleImageUpload(event: Event) {
-     const target = event.target as HTMLInputElement;
-     const files = target.files;
-     if (files) {
-       for (let file of Array.from(files)) {
-         images = [...images, file];
-       }
-       newProduct.images = images;
-     }
-   }
-
-   function removeImage(index: number) {
-     images = images.filter((_, i) => i !== index);
-     newProduct.images = images;
-   }
+  // Props del componente: producto nuevo y imágenes existentes
+  let {
+    newProduct = $bindable({ name: '', price: 0, stock: 0, details: '', images: [] as File[] }),
+    existingImages = [] as string[],
+  } = $props();
 </script>
 
+<!-- Contenedor principal del formulario en grid responsivo -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-  <div class="form-control md:col-span-2">
+  <!-- Campo para el nombre del producto -->
+  <div class="form-control">
     <label class="label" for="name">
       <span class="label-text font-semibold">Nombre</span>
     </label>
     <label class="input input-bordered flex items-center gap-2">
+      <!-- Icono de etiqueta -->
       <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
@@ -47,11 +36,13 @@
     </label>
   </div>
 
+  <!-- Campo para el precio del producto -->
   <div class="form-control">
     <label class="label" for="price">
       <span class="label-text font-semibold">Precio</span>
     </label>
     <label class="input input-bordered flex items-center gap-2">
+      <!-- Icono de dólar -->
       <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
@@ -72,11 +63,27 @@
     </label>
   </div>
 
+  <!-- Campo para los detalles del producto -->
+  <div class="form-control flex flex-col">
+    <label class="label" for="details">
+      <span class="label-text font-semibold">Detalles del Producto</span>
+    </label>
+
+    <textarea
+      id="details"
+      bind:value={newProduct.details}
+      class="textarea textarea-bordered h-24 resize-y"
+      placeholder="Ingrese una descripción detallada del producto..."
+      rows="3"></textarea>
+  </div>
+
+  <!-- Campo para el stock del producto -->
   <div class="form-control">
     <label class="label" for="stock">
       <span class="label-text font-semibold">Stock</span>
     </label>
     <label class="input input-bordered flex items-center gap-2">
+      <!-- Icono de caja -->
       <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
@@ -88,62 +95,6 @@
     </label>
   </div>
 
-  <div class="form-control md:col-span-2">
-    <label class="label" for="details">
-      <span class="label-text font-semibold">Detalles del Producto</span>
-    </label>
-    <textarea
-      id="details"
-      bind:value={newProduct.details}
-      class="textarea textarea-bordered h-24 resize-y"
-      placeholder="Ingrese una descripción detallada del producto..."
-      rows="3"></textarea>
-  </div>
-
-  <div class="form-control md:col-span-2">
-    <label class="label" for="images">
-      <span class="label-text font-semibold">Imágenes del Producto</span>
-    </label>
-     <div class="flex-col items-center gap-4">
-       <input
-         id="images"
-         type="file"
-         accept="image/*"
-         multiple
-         class="file-input file-input-bordered file-input-primary"
-         onchange={handleImageUpload} />
-       <div class="text-sm opacity-70">Selecciona imágenes para agregar</div>
-     </div>
-
-    {#if images.length > 0}
-      <div class="mt-4">
-        <h4 class="font-semibold mb-2">Imágenes Agregadas ({images.length})</h4>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {#each images as image, index}
-            <div class="card bg-base-200">
-              <figure class="px-4 pt-4">
-                 <img src={URL.createObjectURL(image)} alt="Producto {index + 1}" class="w-full h-24 object-cover rounded" />
-              </figure>
-              <div class="card-body p-2">
-                <div class="card-actions justify-end">
-                  <button
-                    type="button"
-                    class="btn btn-xs btn-error"
-                    onclick={() => removeImage(index)}
-                    aria-label="Eliminar imagen">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"
-                      ></path>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          {/each}
-        </div>
-      </div>
-    {/if}
-  </div>
-
-
+  <!-- Componente para manejar las imágenes del producto -->
+  <ProductImageManager bind:newImages={newProduct.images} {existingImages} />
 </div>

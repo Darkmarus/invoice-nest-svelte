@@ -11,5 +11,6 @@ export interface UpdateProductRequest {
   name?: string;
   price?: number;
   stock?: number;
+  details?: string;
   enabled?: boolean;
 }

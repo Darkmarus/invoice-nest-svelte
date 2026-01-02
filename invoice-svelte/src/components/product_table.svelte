@@ -30,7 +30,7 @@
       <tr>
         <th>Nombre</th>
         <th>Precio</th>
-        <th>Categoría</th>
+        <!-- <th>Categoría</th> -->
         <th>Stock</th>
         <th>Imágenes</th>
         <th>Acciones</th>
@@ -46,9 +46,9 @@
             </div>
           </td>
           <td>${(product.price ?? 0).toFixed(2)}</td>
-          <td>
+          <!-- <td>
             <span class="badge badge-outline">{product.category}</span>
-          </td>
+          </td> -->
           <td>
             <span class="badge badge-success">{product.stock ?? 0}</span>
           </td>

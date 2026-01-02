@@ -60,7 +60,7 @@
     <!-- Precio y categoría -->
     <div class="flex items-center justify-between">
       <span class="text-2xl font-bold text-primary">${(product.price ?? 0).toFixed(2)}</span>
-      <div class="badge badge-outline">{product.category}</div>
+      <!-- <div class="badge badge-outline">{product.category}</div> -->
     </div>
     <!-- Acciones de la tarjeta -->
     <div class="card-actions flex flex-col sm:flex-row justify-end gap-2 mt-4">

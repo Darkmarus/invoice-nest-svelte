@@ -12,7 +12,7 @@
         <p class="text-sm opacity-70">{product.details || 'Descripción del producto'}</p>
         <div class="flex justify-between items-center">
           <span class="text-lg font-bold">${(product.price ?? 0).toFixed(2)}</span>
-          <span class="badge badge-outline">{product.category}</span>
+          <!-- <span class="badge badge-outline">{product.category}</span> -->
         </div>
         <div class="flex justify-between items-center mt-2">
           <div class="flex gap-4">

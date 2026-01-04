@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { navigate } from 'sv-router/generated';
-  import { route } from 'sv-router/generated';
+  import { navigate, route } from 'sv-router/generated';
   import { onMount } from 'svelte';
-  import { productsStore } from '../../stores/products_store';
   import { resolvedImages } from '../../stores/config_store';
+  import { productsStore } from '../../stores/products_store';
+  import type { ProductResponse } from '../../models/product_response';
 
-  let product: any = $state(null);
+  let product: ProductResponse | null = $state(null);
   let loading = $state(true);
   let error = $state<string | null>(null);
 
@@ -33,7 +33,7 @@
   });
 
   function handleBack() {
-    navigate('/productos');
+    navigate('/');
   }
 </script>
 
@@ -69,7 +69,7 @@
                 {@const next = i === product.images.length - 1 ? 0 : i + 1}
                 <div id="slide-{product.id}-{i}" class="carousel-item relative w-full">
                   <img
-                    src={resolvedImages(imageUrl)}
+                    src={resolvedImages(imageUrl.path)}
                     alt={product.name}
                     class="rounded-xl h-64 w-full object-cover"
                     onerror={(e) => ((e.target as HTMLImageElement).src = '/not_found.svg')} />
@@ -97,13 +97,18 @@
           <div class="card-actions justify-between">
             <button class="btn btn-ghost" onclick={handleBack}>
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                ></path>
               </svg>
               Volver a Productos
             </button>
             <button class="btn btn-primary">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.1 5H19M7 13v8a2 2 0 002 2h10a2 2 0 002-2v-3"></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.1 5H19M7 13v8a2 2 0 002 2h10a2 2 0 002-2v-3"></path>
               </svg>
               Añadir al Carrito
             </button>

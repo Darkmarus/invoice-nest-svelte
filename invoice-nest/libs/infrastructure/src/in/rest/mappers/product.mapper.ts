@@ -2,14 +2,13 @@ import { DeleteProductCommand } from '@app/application/product/command/delete-pr
 import { UpdateProductCommand } from '@app/application/product/command/update-product.command';
 import { GetProductByIdQuery } from '@app/application/product/query/get-product-by-id.query';
 import type { Product } from '@app/domain/models/product.model';
-import type { CreateProductDto } from '../dto/create-product.dto';
 import { ProductResponseDto } from '../dto/product-response.dto';
 import type { UpdateProductDto } from '../dto/update-product.dto';
 
 export class ProductMapper {
   static toResponse(
     product: Product,
-    images: string[] = [],
+    images: Array<{ path: string; order: number }> = [],
   ): ProductResponseDto {
     return {
       id: product.id ?? '',
@@ -27,6 +26,12 @@ export class ProductMapper {
   static toUpdateCommand(
     id: string,
     updateProductDto: UpdateProductDto,
+    files?: Array<{
+      originalName: string;
+      mimeType: string;
+      buffer: Buffer;
+      order?: number;
+    }>,
   ): UpdateProductCommand {
     return new UpdateProductCommand(
       id,
@@ -35,6 +40,8 @@ export class ProductMapper {
       updateProductDto.price,
       updateProductDto.stock,
       updateProductDto.enabled,
+      updateProductDto.images,
+      files,
     );
   }
 

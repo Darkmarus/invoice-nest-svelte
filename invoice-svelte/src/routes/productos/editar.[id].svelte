@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { FileResponse } from 'src/models/product_response';
   import { navigate, route } from 'sv-router/generated';
   import { onMount } from 'svelte';
   import ProductForm from '../../components/product_form.svelte';
@@ -13,7 +14,7 @@
   });
 
   let productId = $state<string>('');
-  let existingImages = $state<string[]>([]);
+  let existingImages = $state<FileResponse[]>([]);
 
   // Load product data when component mounts
   onMount(async () => {

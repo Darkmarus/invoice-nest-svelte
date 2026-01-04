@@ -9,6 +9,7 @@ import { GetProductByIdQuery } from '../get-product-by-id.query';
 interface ProductWithImages {
   product: Product;
   images: string[];
+  imageOrders: number[];
 }
 
 export class GetProductByIdHandler implements ICommandHandler<
@@ -35,16 +36,19 @@ export class GetProductByIdHandler implements ICommandHandler<
 
     // Fetch file details for each image
     const imagePaths: string[] = [];
+    const imageOrders: number[] = [];
     for (const imageProduct of imageProducts) {
       const file = await this.fileRepository.findById(imageProduct.fileId);
       if (file) {
         imagePaths.push(file.path);
+        imageOrders.push(imageProduct.order);
       }
     }
 
     return {
       product,
       images: imagePaths,
+      imageOrders,
     };
   }
 }

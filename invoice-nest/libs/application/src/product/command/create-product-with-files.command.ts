@@ -4,6 +4,7 @@ interface FileData {
   originalName: string;
   mimeType: string;
   buffer: Buffer;
+  order?: number;
 }
 
 export class CreateProductWithFilesCommand implements ICommand {

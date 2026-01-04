@@ -89,13 +89,15 @@ export class ProductController {
       originalName: string;
       mimeType: string;
       buffer: Buffer;
+      order?: number;
     }> = [];
     if (filesData?.files && Array.isArray(filesData.files)) {
       files.push(
-        ...filesData.files.map((file: MultipartFile) => ({
+        ...filesData.files.map((file: MultipartFile, index: number) => ({
           originalName: file.originalname,
           mimeType: file.mimetype,
           buffer: file.buffer,
+          order: index,
         })),
       );
     }
@@ -151,12 +153,19 @@ export class ProductController {
     const query = new GetAllProductsQuery(filters, pagination);
     const result = await this.commandBus.execute<
       GetAllProductsQuery,
-      PaginatedResult<{ product: Product; images: string[] }>
+      PaginatedResult<{
+        product: Product;
+        images: string[];
+        imageOrders: number[];
+      }>
     >(query);
 
     return {
-      data: result.data.map(({ product, images }) =>
-        ProductMapper.toResponse(product, images),
+      data: result.data.map(({ product, images, imageOrders }) =>
+        ProductMapper.toResponse(
+          product,
+          images.map((path, index) => ({ path, order: imageOrders[index] })),
+        ),
       ),
       page: result.page,
       limit: result.limit,
@@ -178,12 +187,20 @@ export class ProductController {
     const query = ProductMapper.toGetByIdQuery(id);
     const result = await this.commandBus.execute<
       GetProductByIdQuery,
-      { product: Product; images: string[] }
+      { product: Product; images: string[]; imageOrders: number[] }
     >(query);
-    return ProductMapper.toResponse(result.product, result.images);
+    return ProductMapper.toResponse(
+      result.product,
+      result.images.map((path, index) => ({
+        path,
+        order: result.imageOrders[index],
+      })),
+    );
   }
 
   @Put(':id')
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'files', maxCount: 10 }]))
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Actualizar un producto' })
   @ApiParam({ name: 'id', description: 'ID del producto' })
   @ApiResponse({
@@ -195,25 +212,69 @@ export class ProductController {
   @ApiResponse({ status: 400, description: 'Datos de entrada inválidos' })
   async update(
     @Param('id') id: string,
-    @Body() updateProductDto: UpdateProductDto,
+    @Body() body: ProductFormData,
+    @UploadedFiles() filesData: FilesData,
   ): Promise<ProductResponseDto> {
-    const command = ProductMapper.toUpdateCommand(id, updateProductDto);
+    const productData = JSON.parse(body.body) as UpdateProductDto;
+    const dtoInstance = Object.assign(new UpdateProductDto(), productData);
+    const errors = await validate(dtoInstance);
+    if (errors.length > 0) {
+      const errorMessages = errors.map(
+        (err) =>
+          `${err.property}: ${Object.values(err.constraints || {}).join(', ')}`,
+      );
+      throw new BadRequestException(errorMessages.join('; '));
+    }
+
+    const files: Array<{
+      originalName: string;
+      mimeType: string;
+      buffer: Buffer;
+    }> = [];
+    if (filesData?.files && Array.isArray(filesData.files)) {
+      files.push(
+        ...filesData.files.map((file: MultipartFile) => ({
+          originalName: file.originalname,
+          mimeType: file.mimetype,
+          buffer: file.buffer,
+        })),
+      );
+    }
+
+    const filesWithOrder: Array<{
+      originalName: string;
+      mimeType: string;
+      buffer: Buffer;
+      order?: number;
+    }> = filesData?.files
+      ? filesData.files.map((file, index) => ({
+          originalName: file.originalname,
+          mimeType: file.mimetype,
+          buffer: file.buffer,
+          order: index,
+        }))
+      : [];
+
+    const command = ProductMapper.toUpdateCommand(
+      id,
+      productData,
+      filesWithOrder,
+    );
     const product = await this.commandBus.execute<
       UpdateProductCommand,
       Product
     >(command);
-    // For update, we need to fetch images separately since the command doesn't return them
     const imageProducts = await this.imageProductRepository.findByProductId(
       product.id!,
     );
-    const imagePaths: string[] = [];
+    const images: Array<{ path: string; order: number }> = [];
     for (const imageProduct of imageProducts) {
       const file = await this.fileRepository.findById(imageProduct.fileId);
       if (file) {
-        imagePaths.push(file.path);
+        images.push({ path: file.path, order: imageProduct.order });
       }
     }
-    return ProductMapper.toResponse(product, imagePaths);
+    return ProductMapper.toResponse(product, images);
   }
 
   @Delete(':id')

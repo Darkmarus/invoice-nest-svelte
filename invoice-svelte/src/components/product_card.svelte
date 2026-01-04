@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { FileResponse, ProductResponse } from 'src/models/product_response';
   // Importa la función para resolver URLs de imágenes
   import { resolvedImages } from '../stores/config_store';
 
@@ -9,10 +10,10 @@
       name: '',
       details: '',
       price: 0,
-      images: [] as string[],
+      images: [] as FileResponse[],
       description: '',
       category: '',
-    },
+    } as ProductResponse,
   } = $props();
 
   // Calcula un hash para el color de placeholder basado en el ID del producto
@@ -33,7 +34,7 @@
     <figure class:hover-gallery={product.images.length != 1} class="px-4 pt-4">
       {#each product.images as imageUrl}
         <img
-          src={resolvedImages(imageUrl)}
+          src={resolvedImages(imageUrl.path)}
           alt={product.name}
           class="rounded-xl h-48 w-full object-cover"
           onerror={(e) => ((e.target as HTMLImageElement).src = '/not_found.svg')} />

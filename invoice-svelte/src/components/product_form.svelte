@@ -1,11 +1,13 @@
 <script lang="ts">
+  import type { FileResponse } from 'src/models/product_response';
+
   // Importa el componente para manejar imágenes del producto
   import ProductImageManager from './product_image_manager.svelte';
 
   // Props del componente: producto nuevo y imágenes existentes
   let {
     newProduct = $bindable({ name: '', price: 0, stock: 0, details: '', images: [] as File[] }),
-    existingImages = [] as string[],
+    existingImages = [] as FileResponse[],
   } = $props();
 </script>
 

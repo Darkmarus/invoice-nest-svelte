@@ -1,6 +1,13 @@
 import type { ICommand } from '@app/application/utils/command.interface';
 import type { Product } from '@app/domain/models/product.model';
 
+interface FileData {
+  originalName: string;
+  mimeType: string;
+  buffer: Buffer;
+  order?: number;
+}
+
 export class UpdateProductCommand implements ICommand<Product> {
   constructor(
     public readonly id: string,
@@ -9,5 +16,7 @@ export class UpdateProductCommand implements ICommand<Product> {
     public readonly price?: number,
     public readonly stock?: number,
     public readonly enabled?: boolean,
+    public readonly images?: Array<{ imageId: string; order: number }>,
+    public readonly files?: FileData[],
   ) {}
 }

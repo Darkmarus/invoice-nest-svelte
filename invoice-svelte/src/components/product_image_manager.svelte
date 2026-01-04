@@ -1,13 +1,15 @@
 <script lang="ts">
+  import type { FileResponse } from 'src/models/product_response';
+
   // Importa funciones para resolver URLs de imágenes y el componente Cropper
-  import { resolvedImages } from '../stores/config_store';
   import Cropper from 'svelte-easy-crop';
+  import { resolvedImages } from '../stores/config_store';
 
   // Props del componente: imágenes nuevas (bindable) y existentes
-  let { newImages = $bindable([] as File[]), existingImages = [] as string[] } = $props();
+  let { newImages = $bindable([] as File[]), existingImages = [] as FileResponse[] } = $props();
 
   // Estado para las imágenes existentes mostradas
-  let displayedExistingImages = $state<string[]>([]);
+  let displayedExistingImages = $state<FileResponse[]>([]);
 
   // Actualiza las imágenes existentes mostradas cuando cambian las props
   $effect(() => {
@@ -154,7 +156,7 @@
             <!-- Figura con imagen -->
             <figure class="px-4 pt-4">
               <img
-                src={resolvedImages(image)}
+                src={resolvedImages(image.path)}
                 alt="Producto existente {index + 1}"
                 class="w-full h-24 object-cover rounded" />
             </figure>

@@ -3,7 +3,7 @@
 </script>
 
 <section class="bg-base-100">
-  <header class="container mx-auto navbar bg-base-100 shadow-lg">
+  <header class="container mx-auto navbar bg-base-100">
     <div class="navbar-start">
       <div class="dropdown">
         <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">

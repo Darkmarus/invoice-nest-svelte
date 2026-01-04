@@ -1,16 +1,14 @@
 import type { ICommandHandler } from '@app/application/utils/command-handler.interface';
+import { File } from '@app/domain/models/file.model';
 import { ImageProduct } from '@app/domain/models/image-product.model';
 import { Product } from '@app/domain/models/product.model';
-import { File } from '@app/domain/models/file.model';
+import { FileRepository } from '@app/domain/repositories/file.repository';
 import { ImageProductRepository } from '@app/domain/repositories/image-product.repository';
 import { ProductRepository } from '@app/domain/repositories/product.repository';
-import { FileRepository } from '@app/domain/repositories/file.repository';
 import { UnitOfWork } from '@app/domain/repositories/unit-of-work.interface';
 import { FileStorageService } from '@app/infrastructure/out/storage/file-storage.service';
-import { Injectable } from '@nestjs/common';
 import { CreateProductWithFilesCommand } from '../create-product-with-files.command';
 
-@Injectable()
 export class CreateProductWithFilesHandler implements ICommandHandler<
   CreateProductWithFilesCommand,
   Product
@@ -58,10 +56,11 @@ export class CreateProductWithFilesHandler implements ICommandHandler<
 
       // Link product with uploaded files
       if (fileIds.length > 0) {
-        const imageProducts = fileIds.map((fileId) =>
+        const imageProducts = fileIds.map((fileId, index) =>
           ImageProduct.create({
             productId: savedProduct.id!,
             fileId,
+            order: command.files?.[index]?.order ?? index,
           }),
         );
 

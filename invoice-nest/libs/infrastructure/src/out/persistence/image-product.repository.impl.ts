@@ -18,18 +18,21 @@ export class ImageProductRepositoryImpl implements ImageProductRepository {
     await db('image_products').insert({
       product_id: imageProduct.productId,
       file_id: imageProduct.fileId,
+      order: imageProduct.order,
     });
   }
 
   async findByProductId(productId: string): Promise<ImageProduct[]> {
     const results = await this.knex('image_products')
       .where({ product_id: productId })
+      .orderBy('order')
       .select('*');
 
     return results.map((result) =>
       ImageProduct.create({
         productId: result.product_id as string,
         fileId: result.file_id as string,
+        order: result.order as number,
       }),
     );
   }

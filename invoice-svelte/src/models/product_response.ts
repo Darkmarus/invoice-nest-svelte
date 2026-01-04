@@ -10,7 +10,7 @@ export interface ProductResponse {
   updated_at: string;
   description?: string;
   category?: string;
-  images?: string[];
+  images?: FileResponse[];
 }
 
 export interface ProductsResponse {
@@ -19,4 +19,9 @@ export interface ProductsResponse {
   limit: number;
   total: number;
   totalPages: number;
+}
+
+export interface FileResponse {
+  path: string;
+  order: string;
 }

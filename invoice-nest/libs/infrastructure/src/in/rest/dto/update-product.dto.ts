@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsArray,
   IsBoolean,
   IsNumber,
   IsOptional,
@@ -55,4 +56,23 @@ export class UpdateProductDto {
   @IsOptional()
   @IsBoolean()
   enabled?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Lista de imágenes del producto con su orden',
+    example: [
+      { imageId: '123e4567-e89b-12d3-a456-426614174000', order: 0 },
+      { imageId: '123e4567-e89b-12d3-a456-426614174001', order: 1 },
+    ],
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        imageId: { type: 'string' },
+        order: { type: 'number' },
+      },
+    },
+  })
+  @IsOptional()
+  @IsArray()
+  images: Array<{ imageId: string; order: number }>;
 }

@@ -13,6 +13,7 @@ import { GetProductByIdHandler } from '@app/application/product/query/handle/get
 import { FileRepository } from '@app/domain/repositories/file.repository';
 import { ImageProductRepository } from '@app/domain/repositories/image-product.repository';
 import { ProductRepository } from '@app/domain/repositories/product.repository';
+import { UnitOfWork } from '@app/domain/repositories/unit-of-work.interface';
 import { HandlerRegistryService } from '@app/infrastructure/config/handler-registry.service';
 import { FileStorageService } from '@app/infrastructure/out/storage/file-storage.service';
 import { PersistenceModule } from '@app/infrastructure/out/persistence/persistence.module';
@@ -27,12 +28,51 @@ import { CommandBus } from './command-bus.service';
     CommandBus,
     {
       provide: CreateProductWithFilesHandler,
-      useClass: CreateProductWithFilesHandler,
+      useFactory: (
+        productRepo: ProductRepository,
+        imageProductRepo: ImageProductRepository,
+        fileRepo: FileRepository,
+        storage: FileStorageService,
+        unitOfWork: UnitOfWork,
+      ) =>
+        new CreateProductWithFilesHandler(
+          productRepo,
+          imageProductRepo,
+          fileRepo,
+          storage,
+          unitOfWork,
+        ),
+      inject: [
+        ProductRepository,
+        ImageProductRepository,
+        FileRepository,
+        FileStorageService,
+        UnitOfWork,
+      ],
     },
     {
       provide: UpdateProductHandler,
-      useFactory: (repo: ProductRepository) => new UpdateProductHandler(repo),
-      inject: [ProductRepository],
+      useFactory: (
+        productRepo: ProductRepository,
+        imageProductRepo: ImageProductRepository,
+        fileRepo: FileRepository,
+        storage: FileStorageService,
+        unitOfWork: UnitOfWork,
+      ) =>
+        new UpdateProductHandler(
+          productRepo,
+          imageProductRepo,
+          fileRepo,
+          storage,
+          unitOfWork,
+        ),
+      inject: [
+        ProductRepository,
+        ImageProductRepository,
+        FileRepository,
+        FileStorageService,
+        UnitOfWork,
+      ],
     },
     {
       provide: DeleteProductHandler,

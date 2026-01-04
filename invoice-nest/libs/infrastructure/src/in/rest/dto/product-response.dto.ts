@@ -50,9 +50,19 @@ export class ProductResponseDto {
   updated_at: Date;
 
   @ApiProperty({
-    description: 'Lista de rutas de las imágenes del producto',
-    example: ['/uploads/image1.jpg', '/uploads/image2.png'],
-    type: [String],
+    description: 'Lista de imágenes del producto con su orden',
+    example: [
+      { path: '/uploads/image1.jpg', order: 0 },
+      { path: '/uploads/image2.png', order: 1 },
+    ],
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        path: { type: 'string' },
+        order: { type: 'number' },
+      },
+    },
   })
-  images: string[];
+  images: Array<{ path: string; order: number }>;
 }

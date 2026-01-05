@@ -3,6 +3,7 @@
   import { navigate, route } from 'sv-router/generated';
   import { onMount } from 'svelte';
   import ProductForm from '../../components/product_form.svelte';
+  import type { CombinedImage, UpdateProductImage } from '../../models/product_request';
   import { productsStore } from '../../stores/products_store';
 
   let newProduct = $state({
@@ -14,7 +15,7 @@
   });
 
   let productId = $state<string>('');
-  let existingImages = $state<FileResponse[]>([]);
+  let combinedImages = $state<CombinedImage[]>([]);
 
   // Load product data when component mounts
   onMount(async () => {
@@ -27,7 +28,7 @@
         const product = await productsStore.fetchProduct(id);
         if (product) {
           productId = product.id;
-          existingImages = product.images || [];
+          combinedImages = product.images?.map((img) => ({ type: 'existing' as const, data: img })) || [];
           newProduct = {
             name: product.name,
             price: product.price ?? 0,
@@ -50,11 +51,28 @@
 
   async function handleSave() {
     try {
+      // Extract ordered existing images and new images from combinedImages
+      const orderedImages: UpdateProductImage[] = [];
+      const newImages: File[] = [];
+      const newOrders: number[] = [];
+      combinedImages.forEach((item, index) => {
+        if (item.type === 'existing') {
+          orderedImages.push({ id: (item.data as FileResponse).id, order: index });
+        }
+        if (item.type === 'new') {
+          newImages.push(item.data as File);
+          newOrders.push(index);
+        }
+      });
+
       await productsStore.update(productId, {
         name: newProduct.name,
         details: newProduct.details,
         price: newProduct.price,
         stock: newProduct.stock,
+        images: orderedImages,
+        newImages: newImages,
+        newOrders: newOrders,
       });
       navigate('/productos');
     } catch (err) {
@@ -92,7 +110,7 @@
           Editar Producto
         </h2>
 
-        <ProductForm bind:newProduct {existingImages} />
+        <ProductForm bind:newProduct bind:combinedImages />
 
         <div class="card-actions justify-end mt-6">
           <button class="btn btn-ghost" onclick={handleCancel}>

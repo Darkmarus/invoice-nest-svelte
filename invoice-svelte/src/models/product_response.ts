@@ -22,6 +22,7 @@ export interface ProductsResponse {
 }
 
 export interface FileResponse {
+  id: string;
   path: string;
   order: string;
 }

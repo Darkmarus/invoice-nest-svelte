@@ -52,17 +52,26 @@ export class ProductResponseDto {
   @ApiProperty({
     description: 'Lista de imágenes del producto con su orden',
     example: [
-      { path: '/uploads/image1.jpg', order: 0 },
-      { path: '/uploads/image2.png', order: 1 },
+      {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        path: '/uploads/image1.jpg',
+        order: 0,
+      },
+      {
+        id: '456e7890-e89b-12d3-a456-426614174001',
+        path: '/uploads/image2.png',
+        order: 1,
+      },
     ],
     type: 'array',
     items: {
       type: 'object',
       properties: {
+        id: { type: 'string' },
         path: { type: 'string' },
         order: { type: 'number' },
       },
     },
   })
-  images: Array<{ path: string; order: number }>;
+  images: Array<{ id: string; path: string; order: number }>;
 }

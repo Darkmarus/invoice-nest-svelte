@@ -1,12 +1,12 @@
-import { UpdateProductCommand } from '@app/application/product/command/update-product.command';
 import { CreateProductWithFilesCommand } from '@app/application/product/command/create-product-with-files.command';
+import { UpdateProductCommand } from '@app/application/product/command/update-product.command';
 import { GetAllProductsQuery } from '@app/application/product/query/get-all-products.query';
 import { GetProductByIdQuery } from '@app/application/product/query/get-product-by-id.query';
 
 import type { Product } from '@app/domain/models/product.model';
-import type { PaginatedResult } from '@app/domain/repositories/product-filters.interface';
-import { ImageProductRepository } from '@app/domain/repositories/image-product.repository';
 import { FileRepository } from '@app/domain/repositories/file.repository';
+import { ImageProductRepository } from '@app/domain/repositories/image-product.repository';
+import type { PaginatedResult } from '@app/domain/repositories/product-filters.interface';
 import { CommandBus } from '@app/infrastructure/config/command-bus.service';
 import {
   BadRequestException,
@@ -157,14 +157,19 @@ export class ProductController {
         product: Product;
         images: string[];
         imageOrders: number[];
+        imageIds: string[];
       }>
     >(query);
 
     return {
-      data: result.data.map(({ product, images, imageOrders }) =>
+      data: result.data.map(({ product, images, imageOrders, imageIds }) =>
         ProductMapper.toResponse(
           product,
-          images.map((path, index) => ({ path, order: imageOrders[index] })),
+          images.map((path, index) => ({
+            id: imageIds[index],
+            path,
+            order: imageOrders[index],
+          })),
         ),
       ),
       page: result.page,
@@ -187,11 +192,17 @@ export class ProductController {
     const query = ProductMapper.toGetByIdQuery(id);
     const result = await this.commandBus.execute<
       GetProductByIdQuery,
-      { product: Product; images: string[]; imageOrders: number[] }
+      {
+        product: Product;
+        images: string[];
+        imageOrders: number[];
+        imageIds: string[];
+      }
     >(query);
     return ProductMapper.toResponse(
       result.product,
       result.images.map((path, index) => ({
+        id: result.imageIds[index],
         path,
         order: result.imageOrders[index],
       })),
@@ -251,7 +262,7 @@ export class ProductController {
           originalName: file.originalname,
           mimeType: file.mimetype,
           buffer: file.buffer,
-          order: index,
+          order: dtoInstance.newOrders && dtoInstance.newOrders[index],
         }))
       : [];
 
@@ -267,11 +278,15 @@ export class ProductController {
     const imageProducts = await this.imageProductRepository.findByProductId(
       product.id!,
     );
-    const images: Array<{ path: string; order: number }> = [];
+    const images: Array<{ id: string; path: string; order: number }> = [];
     for (const imageProduct of imageProducts) {
       const file = await this.fileRepository.findById(imageProduct.fileId);
       if (file) {
-        images.push({ path: file.path, order: imageProduct.order });
+        images.push({
+          id: imageProduct.fileId,
+          path: file.path,
+          order: imageProduct.order,
+        });
       }
     }
     return ProductMapper.toResponse(product, images);

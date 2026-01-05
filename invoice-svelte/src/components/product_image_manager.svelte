@@ -1,24 +1,15 @@
 <script lang="ts">
-  import type { FileResponse } from 'src/models/product_response';
+  import type { CombinedImage } from '../models/product_request';
 
   // Importa funciones para resolver URLs de imágenes y el componente Cropper
   import Cropper from 'svelte-easy-crop';
   import { resolvedImages } from '../stores/config_store';
 
-  // Props del componente: imágenes nuevas (bindable) y existentes
-  let { newImages = $bindable([] as File[]), existingImages = [] as FileResponse[] } = $props();
-
-  // Estado para las imágenes existentes mostradas
-  let displayedExistingImages = $state<FileResponse[]>([]);
-
-  // Actualiza las imágenes existentes mostradas cuando cambian las props
-  $effect(() => {
-    displayedExistingImages = existingImages;
-  });
+  // Props del componente: imágenes combinadas
+  let { combinedImages = $bindable([] as CombinedImage[]) } = $props();
 
   // Estado para drag and drop
   let draggedIndex = $state<number | null>(null);
-  let draggedType = $state<'new' | 'existing' | null>(null);
   let dragOverIndex = $state<number | null>(null);
 
   // Estados para el modal de recorte
@@ -91,7 +82,7 @@
             lastModified: Date.now(),
           });
 
-          newImages = [...newImages, croppedFile];
+          combinedImages = [...combinedImages, { type: 'new', data: croppedFile }];
 
           // Reset crop state
           showCropModal = false;
@@ -115,20 +106,14 @@
     croppedImageFile = null;
   }
 
-  // Elimina una imagen nueva
-  function removeNewImage(index: number) {
-    newImages = newImages.filter((_, i) => i !== index);
-  }
-
-  // Elimina una imagen existente de la visualización
-  function removeExistingImage(index: number) {
-    displayedExistingImages = displayedExistingImages.filter((_, i) => i !== index);
+  // Elimina una imagen del índice dado
+  function removeImage(index: number) {
+    combinedImages = combinedImages.filter((_, i) => i !== index);
   }
 
   // Drag and drop handlers
-  function handleDragStart(event: DragEvent, index: number, type: 'new' | 'existing') {
+  function handleDragStart(event: DragEvent, index: number) {
     draggedIndex = index;
-    draggedType = type;
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'move';
     }
@@ -141,9 +126,9 @@
     }
   }
 
-  function handleDragEnter(event: DragEvent, index: number, type: 'new' | 'existing') {
+  function handleDragEnter(event: DragEvent, index: number) {
     event.preventDefault();
-    if (draggedType === type && index !== draggedIndex) {
+    if (index !== draggedIndex) {
       dragOverIndex = index;
     }
   }
@@ -157,30 +142,21 @@
     }
   }
 
-  function handleDrop(event: DragEvent, targetIndex: number, targetType: 'new' | 'existing') {
+  function handleDrop(event: DragEvent, targetIndex: number) {
     event.preventDefault();
-    if (draggedIndex === null || draggedType === null) return;
+    if (draggedIndex === null) return;
 
-    if (draggedType === 'new' && targetType === 'new') {
-      const items = [...newImages];
-      const [removed] = items.splice(draggedIndex, 1);
-      items.splice(targetIndex, 0, removed);
-      newImages = items;
-    } else if (draggedType === 'existing' && targetType === 'existing') {
-      const items = [...displayedExistingImages];
-      const [removed] = items.splice(draggedIndex, 1);
-      items.splice(targetIndex, 0, removed);
-      displayedExistingImages = items;
-    }
+    const items = [...combinedImages];
+    const [removed] = items.splice(draggedIndex, 1);
+    items.splice(targetIndex, 0, removed);
+    combinedImages = items;
 
     draggedIndex = null;
-    draggedType = null;
     dragOverIndex = null;
   }
 
   function handleDragEnd() {
     draggedIndex = null;
-    draggedType = null;
     dragOverIndex = null;
   }
 </script>
@@ -205,40 +181,48 @@
     <div class="text-sm opacity-70">Selecciona imágenes para recortar y agregar</div>
   </div>
 
-  <!-- Si hay imágenes existentes o nuevas, mostrar el grid -->
-  {#if displayedExistingImages.length > 0 || newImages.length > 0}
+  <!-- Si hay imágenes, mostrar el grid -->
+  {#if combinedImages.length > 0}
     <!-- Contenedor con margen superior -->
     <div class="mt-4">
       <!-- Título con contador de imágenes -->
-      <h4 class="font-semibold mb-2">Imágenes del Producto ({displayedExistingImages.length + newImages.length})</h4>
+      <h4 class="font-semibold mb-2">Imágenes del Producto ({combinedImages.length})</h4>
       <!-- Grid responsivo para mostrar las imágenes -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <!-- Itera sobre imágenes existentes -->
-        {#each displayedExistingImages as image, index}
-          <!-- Tarjeta para cada imagen existente -->
+        <!-- Itera sobre imágenes combinadas -->
+        {#each combinedImages as item, index}
+          <!-- Tarjeta para cada imagen -->
           <div
-            class="card cursor-move {draggedIndex === index && draggedType === 'existing'
+            class="card cursor-move {draggedIndex === index
               ? 'opacity-50'
-              : dragOverIndex === index && draggedType === 'existing'
+              : dragOverIndex === index
                 ? 'ring-4 ring-primary ring-opacity-50 bg-base-300'
                 : 'bg-base-200'}"
             draggable="true"
             role="button"
             tabindex="0"
-            aria-label="Arrastrar imagen existente {index + 1}"
-            ondragstart={(e) => handleDragStart(e, index, 'existing')}
+            aria-label="Arrastrar imagen {index + 1}"
+            ondragstart={(e) => handleDragStart(e, index)}
             ondragover={handleDragOver}
-            ondragenter={(e) => handleDragEnter(e, index, 'existing')}
+            ondragenter={(e) => handleDragEnter(e, index)}
             ondragleave={handleDragLeave}
-            ondrop={(e) => handleDrop(e, index, 'existing')}
+            ondrop={(e) => handleDrop(e, index)}
             ondragend={handleDragEnd}>
             <!-- Figura con imagen -->
             <figure class="px-4 pt-4">
-              <img
-                src={resolvedImages(image.path)}
-                alt="Producto existente {index + 1}"
-                class="w-full h-24 object-cover rounded"
-                draggable="false" />
+              {#if item.type === 'existing'}
+                <img
+                  src={resolvedImages((item.data as import('src/models/product_response').FileResponse).path)}
+                  alt="Producto existente {index + 1}"
+                  class="w-full h-24 object-cover rounded"
+                  draggable="false" />
+              {:else}
+                <img
+                  src={URL.createObjectURL(item.data as File)}
+                  alt="Producto nuevo {index + 1}"
+                  class="w-full h-24 object-cover rounded"
+                  draggable="false" />
+              {/if}
             </figure>
             <!-- Cuerpo de la tarjeta con acciones -->
             <div class="card-body p-2">
@@ -247,62 +231,12 @@
                 <svg class="w-4 h-4 opacity-50 cursor-grab" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path>
                 </svg>
-                <!-- Botón para eliminar imagen existente -->
+                <!-- Botón para eliminar imagen -->
                 <button
                   type="button"
                   class="btn btn-xs btn-error"
-                  onclick={() => removeExistingImage(index)}
-                  aria-label="Eliminar imagen existente">
-                  <!-- Icono de X -->
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"
-                    ></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        {/each}
-        <!-- Itera sobre imágenes nuevas -->
-        {#each newImages as image, index}
-          <!-- Tarjeta para cada imagen nueva -->
-          <div
-            class="card cursor-move {draggedIndex === index && draggedType === 'new'
-              ? 'opacity-50'
-              : dragOverIndex === index && draggedType === 'new'
-                ? 'ring-4 ring-primary ring-opacity-50 bg-base-300'
-                : 'bg-base-200'}"
-            draggable="true"
-            role="button"
-            tabindex="0"
-            aria-label="Arrastrar imagen nueva {index + 1}"
-            ondragstart={(e) => handleDragStart(e, index, 'new')}
-            ondragover={handleDragOver}
-            ondragenter={(e) => handleDragEnter(e, index, 'new')}
-            ondragleave={handleDragLeave}
-            ondrop={(e) => handleDrop(e, index, 'new')}
-            ondragend={handleDragEnd}>
-            <!-- Figura con imagen -->
-            <figure class="px-4 pt-4">
-              <img
-                src={URL.createObjectURL(image)}
-                alt="Producto nuevo {index + 1}"
-                class="w-full h-24 object-cover rounded"
-                draggable="false" />
-            </figure>
-            <!-- Cuerpo de la tarjeta con acciones -->
-            <div class="card-body p-2">
-              <div class="card-actions justify-between">
-                <!-- Indicador de arrastre -->
-                <svg class="w-4 h-4 opacity-50 cursor-grab" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path>
-                </svg>
-                <!-- Botón para eliminar imagen nueva -->
-                <button
-                  type="button"
-                  class="btn btn-xs btn-error"
-                  onclick={() => removeNewImage(index)}
-                  aria-label="Eliminar imagen nueva">
+                  onclick={() => removeImage(index)}
+                  aria-label="Eliminar imagen">
                   <!-- Icono de X -->
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"

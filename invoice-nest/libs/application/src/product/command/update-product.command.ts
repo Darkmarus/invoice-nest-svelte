@@ -16,7 +16,7 @@ export class UpdateProductCommand implements ICommand<Product> {
     public readonly price?: number,
     public readonly stock?: number,
     public readonly enabled?: boolean,
-    public readonly images?: Array<{ imageId: string; order: number }>,
+    public readonly images?: Array<{ id: string; order: number }>,
     public readonly files?: FileData[],
   ) {}
 }

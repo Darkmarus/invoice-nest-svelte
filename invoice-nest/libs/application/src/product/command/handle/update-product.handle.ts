@@ -53,7 +53,7 @@ export class UpdateProductHandler implements ICommandHandler<
 
       const existingImages =
         (command.images || []).map((image) => ({
-          fileId: image.imageId,
+          fileId: image.id,
           order: image.order,
         })) ?? [];
 

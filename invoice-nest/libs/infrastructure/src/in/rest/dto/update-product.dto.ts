@@ -74,5 +74,17 @@ export class UpdateProductDto {
   })
   @IsOptional()
   @IsArray()
-  images: Array<{ imageId: string; order: number }>;
+  images: Array<{ id: string; order: number }>;
+
+  @ApiPropertyOptional({
+    description: 'Lista de orden de las nuevas imágenes',
+    example: [2, 6],
+    type: 'array',
+    items: {
+      type: 'number',
+    },
+  })
+  @IsOptional()
+  @IsArray()
+  newOrders?: Array<number>;
 }

@@ -1,13 +1,13 @@
 <script lang="ts">
-  import type { FileResponse } from 'src/models/product_response';
+  import type { CombinedImage } from '../models/product_request';
 
   // Importa el componente para manejar imágenes del producto
   import ProductImageManager from './product_image_manager.svelte';
 
-  // Props del componente: producto nuevo y imágenes existentes
+  // Props del componente: producto nuevo y imágenes combinadas
   let {
     newProduct = $bindable({ name: '', price: 0, stock: 0, details: '', images: [] as File[] }),
-    existingImages = [] as FileResponse[],
+    combinedImages = $bindable([] as CombinedImage[]),
   } = $props();
 </script>
 
@@ -98,5 +98,5 @@
   </div>
 
   <!-- Componente para manejar las imágenes del producto -->
-  <ProductImageManager bind:newImages={newProduct.images} {existingImages} />
+  <ProductImageManager bind:combinedImages />
 </div>

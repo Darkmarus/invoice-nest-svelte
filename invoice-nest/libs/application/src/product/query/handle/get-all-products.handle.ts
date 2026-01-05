@@ -10,6 +10,7 @@ interface ProductWithImages {
   product: Product;
   images: string[];
   imageOrders: number[];
+  imageIds: string[];
 }
 
 export class GetAllProductsHandler implements ICommandHandler<
@@ -38,9 +39,11 @@ export class GetAllProductsHandler implements ICommandHandler<
         );
         const imagePaths: string[] = [];
         const imageOrders: number[] = [];
+        const imageIds: string[] = [];
         for (const imageProduct of imageProducts) {
           const file = await this.fileRepository.findById(imageProduct.fileId);
           if (file) {
+            imageIds.push(imageProduct.fileId);
             imagePaths.push(file.path);
             imageOrders.push(imageProduct.order);
           }
@@ -49,6 +52,7 @@ export class GetAllProductsHandler implements ICommandHandler<
           product,
           images: imagePaths,
           imageOrders,
+          imageIds,
         };
       }),
     );

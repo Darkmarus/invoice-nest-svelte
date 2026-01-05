@@ -8,7 +8,7 @@ import type { UpdateProductDto } from '../dto/update-product.dto';
 export class ProductMapper {
   static toResponse(
     product: Product,
-    images: Array<{ path: string; order: number }> = [],
+    images: Array<{ id: string; path: string; order: number }> = [],
   ): ProductResponseDto {
     return {
       id: product.id ?? '',

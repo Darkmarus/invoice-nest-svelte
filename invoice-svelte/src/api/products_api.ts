@@ -41,7 +41,23 @@ export class ProductApiService {
   }
 
   async updateProduct(id: string, data: UpdateProductRequest): Promise<[ApiError | null, ProductResponse | null]> {
-    return apiClient.put<ProductResponse>(`${apiUrl()}/products/${id}`, data);
+    const formData = new FormData();
+    const productBody = {
+      name: data.name,
+      details: data.details,
+      price: data.price,
+      stock: data.stock,
+      enabled: data.enabled,
+      images: data.images,
+      newOrders: data.newOrders,
+    };
+    formData.append('body', JSON.stringify(productBody));
+    if (data.newImages) {
+      data.newImages.forEach((file) => {
+        formData.append('files', file);
+      });
+    }
+    return apiClient.putForm<ProductResponse>(`${apiUrl()}/products/${id}`, formData);
   }
 
   async deleteProduct(id: string): Promise<[ApiError | null, void | null]> {

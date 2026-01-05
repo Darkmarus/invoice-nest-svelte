@@ -22,7 +22,7 @@
   }
 </script>
 
-<section class="">
+<section>
   <div class="container mx-auto">
     {#if $productsStore.loading}
       <div class="flex justify-center">

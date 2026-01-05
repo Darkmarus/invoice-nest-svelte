@@ -16,6 +16,11 @@
     displayedExistingImages = existingImages;
   });
 
+  // Estado para drag and drop
+  let draggedIndex = $state<number | null>(null);
+  let draggedType = $state<'new' | 'existing' | null>(null);
+  let dragOverIndex = $state<number | null>(null);
+
   // Estados para el modal de recorte
   let showCropModal = $state(false);
   let imageToCrop = $state<string>('');
@@ -119,6 +124,65 @@
   function removeExistingImage(index: number) {
     displayedExistingImages = displayedExistingImages.filter((_, i) => i !== index);
   }
+
+  // Drag and drop handlers
+  function handleDragStart(event: DragEvent, index: number, type: 'new' | 'existing') {
+    draggedIndex = index;
+    draggedType = type;
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+    }
+  }
+
+  function handleDragOver(event: DragEvent) {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+  }
+
+  function handleDragEnter(event: DragEvent, index: number, type: 'new' | 'existing') {
+    event.preventDefault();
+    if (draggedType === type && index !== draggedIndex) {
+      dragOverIndex = index;
+    }
+  }
+
+  function handleDragLeave(event: DragEvent) {
+    if (!event.currentTarget || !event.relatedTarget) return;
+    const current = event.currentTarget as HTMLElement;
+    const related = event.relatedTarget as HTMLElement;
+    if (!current.contains(related)) {
+      dragOverIndex = null;
+    }
+  }
+
+  function handleDrop(event: DragEvent, targetIndex: number, targetType: 'new' | 'existing') {
+    event.preventDefault();
+    if (draggedIndex === null || draggedType === null) return;
+
+    if (draggedType === 'new' && targetType === 'new') {
+      const items = [...newImages];
+      const [removed] = items.splice(draggedIndex, 1);
+      items.splice(targetIndex, 0, removed);
+      newImages = items;
+    } else if (draggedType === 'existing' && targetType === 'existing') {
+      const items = [...displayedExistingImages];
+      const [removed] = items.splice(draggedIndex, 1);
+      items.splice(targetIndex, 0, removed);
+      displayedExistingImages = items;
+    }
+
+    draggedIndex = null;
+    draggedType = null;
+    dragOverIndex = null;
+  }
+
+  function handleDragEnd() {
+    draggedIndex = null;
+    draggedType = null;
+    dragOverIndex = null;
+  }
 </script>
 
 <!-- Sección de control de formulario para imágenes, ocupa 2 columnas en md -->
@@ -152,17 +216,37 @@
         <!-- Itera sobre imágenes existentes -->
         {#each displayedExistingImages as image, index}
           <!-- Tarjeta para cada imagen existente -->
-          <div class="card bg-base-200">
+          <div
+            class="card cursor-move {draggedIndex === index && draggedType === 'existing'
+              ? 'opacity-50'
+              : dragOverIndex === index && draggedType === 'existing'
+                ? 'ring-4 ring-primary ring-opacity-50 bg-base-300'
+                : 'bg-base-200'}"
+            draggable="true"
+            role="button"
+            tabindex="0"
+            aria-label="Arrastrar imagen existente {index + 1}"
+            ondragstart={(e) => handleDragStart(e, index, 'existing')}
+            ondragover={handleDragOver}
+            ondragenter={(e) => handleDragEnter(e, index, 'existing')}
+            ondragleave={handleDragLeave}
+            ondrop={(e) => handleDrop(e, index, 'existing')}
+            ondragend={handleDragEnd}>
             <!-- Figura con imagen -->
             <figure class="px-4 pt-4">
               <img
                 src={resolvedImages(image.path)}
                 alt="Producto existente {index + 1}"
-                class="w-full h-24 object-cover rounded" />
+                class="w-full h-24 object-cover rounded"
+                draggable="false" />
             </figure>
             <!-- Cuerpo de la tarjeta con acciones -->
             <div class="card-body p-2">
-              <div class="card-actions justify-end">
+              <div class="card-actions justify-between">
+                <!-- Indicador de arrastre -->
+                <svg class="w-4 h-4 opacity-50 cursor-grab" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path>
+                </svg>
                 <!-- Botón para eliminar imagen existente -->
                 <button
                   type="button"
@@ -182,17 +266,37 @@
         <!-- Itera sobre imágenes nuevas -->
         {#each newImages as image, index}
           <!-- Tarjeta para cada imagen nueva -->
-          <div class="card bg-base-200">
+          <div
+            class="card cursor-move {draggedIndex === index && draggedType === 'new'
+              ? 'opacity-50'
+              : dragOverIndex === index && draggedType === 'new'
+                ? 'ring-4 ring-primary ring-opacity-50 bg-base-300'
+                : 'bg-base-200'}"
+            draggable="true"
+            role="button"
+            tabindex="0"
+            aria-label="Arrastrar imagen nueva {index + 1}"
+            ondragstart={(e) => handleDragStart(e, index, 'new')}
+            ondragover={handleDragOver}
+            ondragenter={(e) => handleDragEnter(e, index, 'new')}
+            ondragleave={handleDragLeave}
+            ondrop={(e) => handleDrop(e, index, 'new')}
+            ondragend={handleDragEnd}>
             <!-- Figura con imagen -->
             <figure class="px-4 pt-4">
               <img
                 src={URL.createObjectURL(image)}
                 alt="Producto nuevo {index + 1}"
-                class="w-full h-24 object-cover rounded" />
+                class="w-full h-24 object-cover rounded"
+                draggable="false" />
             </figure>
             <!-- Cuerpo de la tarjeta con acciones -->
             <div class="card-body p-2">
-              <div class="card-actions justify-end">
+              <div class="card-actions justify-between">
+                <!-- Indicador de arrastre -->
+                <svg class="w-4 h-4 opacity-50 cursor-grab" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path>
+                </svg>
                 <!-- Botón para eliminar imagen nueva -->
                 <button
                   type="button"

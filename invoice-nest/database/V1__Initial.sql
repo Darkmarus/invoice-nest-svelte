@@ -13,21 +13,27 @@ CREATE TABLE files(
     CONSTRAINT files_unique UNIQUE(id)
 );
 
-CREATE TABLE products(
-    id uuid DEFAULT gen_random_uuid() NULL PRIMARY KEY,
-    "name" varchar(120) NULL,
-    stock int4 NULL,
-    price numeric(15, 2) NULL,
+
+CREATE TABLE public.products (
+	id uuid DEFAULT gen_random_uuid() NOT NULL,
+	"name" varchar(120) NULL,
+	stock int4 NULL,
+	price numeric(15, 2) NULL,
     details varchar(255) NULL,
-    "enabled" boolean NULL,
-    created_at timestamp with time zone NULL,
-    updated_at timestamp with time zone NULL
+	enabled bool NULL,
+	created_at timestamptz NULL,
+	updated_at timestamptz NULL,
+	deleted_at timestamptz NULL,
+	CONSTRAINT products_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE image_products(
-    product_id uuid NULL REFERENCES products(id),
-    file_id uuid NULL REFERENCES files(id),
-    PRIMARY KEY(product_id, file_id)
+CREATE TABLE image_products (
+	product_id uuid NOT NULL,
+	file_id uuid NOT NULL,
+	"order" int2 DEFAULT 0 NOT NULL,
+	CONSTRAINT image_products_pkey PRIMARY KEY (product_id, file_id),
+	CONSTRAINT image_products_file_id_fkey FOREIGN KEY (file_id) REFERENCES public.files(id),
+	CONSTRAINT image_products_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id)
 );
 
 CREATE TABLE customers(

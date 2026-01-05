@@ -8,6 +8,7 @@ export class Product {
     public enabled: boolean,
     public readonly created_at: Date,
     public updated_at: Date,
+    public readonly deleted_at: Date | null,
   ) {}
 
   public static create(props: {
@@ -26,6 +27,7 @@ export class Product {
       false,
       now,
       now,
+      null,
     );
   }
 
@@ -38,6 +40,7 @@ export class Product {
     enabled: boolean;
     created_at: Date;
     updated_at: Date;
+    deleted_at: Date | null;
   }): Product {
     return new Product(
       props.id,
@@ -48,6 +51,7 @@ export class Product {
       props.enabled,
       props.created_at,
       props.updated_at,
+      props.deleted_at,
     );
   }
 }

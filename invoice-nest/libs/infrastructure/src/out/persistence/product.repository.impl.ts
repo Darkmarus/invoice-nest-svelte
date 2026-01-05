@@ -26,6 +26,7 @@ export class ProductRepositoryImpl implements ProductRepository {
         enabled: product.enabled,
         created_at: product.created_at,
         updated_at: product.updated_at,
+        deleted_at: product.deleted_at,
       })
       .returning('*');
 
@@ -38,11 +39,15 @@ export class ProductRepositoryImpl implements ProductRepository {
       enabled: saved.enabled as boolean,
       created_at: new Date(saved.created_at),
       updated_at: new Date(saved.updated_at),
+      deleted_at: saved.deleted_at ? new Date(saved.deleted_at) : null,
     });
   }
 
   async findById(id: string): Promise<Product | null> {
-    const result = await this.knex('products').where({ id }).first();
+    const result = await this.knex('products')
+      .where({ id })
+      .whereNull('deleted_at')
+      .first();
 
     if (!result) {
       return null;
@@ -57,11 +62,14 @@ export class ProductRepositoryImpl implements ProductRepository {
       enabled: result.enabled as boolean,
       created_at: new Date(result.created_at),
       updated_at: new Date(result.updated_at),
+      deleted_at: result.deleted_at ? new Date(result.deleted_at) : null,
     });
   }
 
   async findAll(): Promise<Product[]> {
-    const results = await this.knex('products').select('*');
+    const results = await this.knex('products')
+      .select('*')
+      .whereNull('deleted_at');
 
     return results.map((result) =>
       Product.rehydrate({
@@ -73,6 +81,7 @@ export class ProductRepositoryImpl implements ProductRepository {
         enabled: result.enabled,
         created_at: new Date(result.created_at),
         updated_at: new Date(result.updated_at),
+        deleted_at: result.deleted_at ? new Date(result.deleted_at) : null,
       }),
     );
   }
@@ -81,7 +90,7 @@ export class ProductRepositoryImpl implements ProductRepository {
     filters: ProductFilters,
     pagination: PaginationParams,
   ): Promise<PaginatedResult<Product>> {
-    let query = this.knex('products');
+    let query = this.knex('products').whereNull('deleted_at');
 
     // Aplicar filtros
     if (filters.name) {
@@ -126,6 +135,7 @@ export class ProductRepositoryImpl implements ProductRepository {
         enabled: result.enabled,
         created_at: new Date(result.created_at),
         updated_at: new Date(result.updated_at),
+        deleted_at: result.deleted_at ? new Date(result.deleted_at) : null,
       }),
     );
 
@@ -144,6 +154,7 @@ export class ProductRepositoryImpl implements ProductRepository {
     const updated_at = new Date();
     const [updated] = await this.knex('products')
       .where({ id: product.id })
+      .whereNull('deleted_at')
       .update({
         name: product.name,
         stock: product.stock,
@@ -163,10 +174,14 @@ export class ProductRepositoryImpl implements ProductRepository {
       enabled: updated.enabled as boolean,
       created_at: new Date(updated.created_at),
       updated_at: new Date(updated.updated_at),
+      deleted_at: updated.deleted_at ? new Date(updated.deleted_at) : null,
     });
   }
 
   async delete(id: string): Promise<void> {
-    await this.knex('products').where({ id }).del();
+    await this.knex('products')
+      .where({ id })
+      .whereNull('deleted_at')
+      .update({ deleted_at: new Date() });
   }
 }

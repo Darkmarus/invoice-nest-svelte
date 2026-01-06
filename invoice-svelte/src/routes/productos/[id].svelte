@@ -100,6 +100,8 @@
           {#if product.images && product.images.length > 0}
             <div
               class="relative rounded-2xl overflow-hidden mb-8 bg-base-200 border border-base-300 shadow-lg"
+              role="region"
+              aria-label="Carrusel de imágenes del producto"
               onmouseenter={() => (isPaused = true)}
               onmouseleave={() => (isPaused = false)}>
               <div class="relative aspect-[16/10] md:aspect-[3/2]">
@@ -119,14 +121,16 @@
                 {#if product.images.length > 1}
                   <button
                     onclick={prevSlide}
-                    class="absolute left-4 top-1/2 -translate-y-1/2 btn btn-circle btn-ghost bg-black/20 hover:bg-black/40 border-0 text-white backdrop-blur-sm transition-all duration-300">
+                    class="absolute left-4 top-1/2 -translate-y-1/2 btn btn-circle btn-ghost bg-black/20 hover:bg-black/40 border-0 text-white backdrop-blur-sm transition-all duration-300"
+                    aria-label="Imagen anterior">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                     </svg>
                   </button>
                   <button
                     onclick={nextSlide}
-                    class="absolute right-4 top-1/2 -translate-y-1/2 btn btn-circle btn-ghost bg-black/20 hover:bg-black/40 border-0 text-white backdrop-blur-sm transition-all duration-300">
+                    class="absolute right-4 top-1/2 -translate-y-1/2 btn btn-circle btn-ghost bg-black/20 hover:bg-black/40 border-0 text-white backdrop-blur-sm transition-all duration-300"
+                    aria-label="Imagen siguiente">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>

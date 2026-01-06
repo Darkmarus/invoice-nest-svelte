@@ -21,10 +21,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV USER=node
 
-COPY --from=build $DIR/package.json .
-COPY --from=build $DIR/package*.json .
-COPY --from=build $DIR/node_modules node_modules
-COPY --from=build $DIR/dist dist
+COPY --from=build /app/package*.json .
+COPY --from=build /app/node_modules node_modules
+COPY --from=build /app/dist dist
 
 USER $USER
 EXPOSE 3000

@@ -1,20 +1,17 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE files(
-    id uuid DEFAULT gen_random_uuid() NULL PRIMARY KEY,
-    "name" varchar(80) NULL,
-    "path" varchar(255) NULL,
-    "type" varchar(40) NULL,
-    "size" float4 NULL,
-    is_folder boolean NULL,
-    parent_id uuid NULL,
-    created_at timestamp with time zone NULL,
-    updated_at timestamp with time zone NULL,
-    CONSTRAINT files_unique UNIQUE(id)
+CREATE TABLE public.files (
+	id uuid DEFAULT gen_random_uuid() NOT NULL,
+	name varchar(80) NULL,
+	"path" varchar(255) NULL,
+	"type" varchar(40) NULL,
+	created_at timestamptz NULL,
+	updated_at timestamptz NULL,
+	CONSTRAINT files_unique PRIMARY KEY (id)
 );
 
 
-CREATE TABLE public.products (
+CREATE TABLE products (
 	id uuid DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(120) NULL,
 	stock int4 NULL,
@@ -32,8 +29,8 @@ CREATE TABLE image_products (
 	file_id uuid NOT NULL,
 	"order" int2 DEFAULT 0 NOT NULL,
 	CONSTRAINT image_products_pkey PRIMARY KEY (product_id, file_id),
-	CONSTRAINT image_products_file_id_fkey FOREIGN KEY (file_id) REFERENCES public.files(id),
-	CONSTRAINT image_products_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id)
+	CONSTRAINT image_products_file_id_fkey FOREIGN KEY (file_id) REFERENCES files(id),
+	CONSTRAINT image_products_product_id_fkey FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
 CREATE TABLE customers(

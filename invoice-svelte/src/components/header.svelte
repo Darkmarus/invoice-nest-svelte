@@ -28,6 +28,7 @@
             <ul class="menu menu-vertical text-xl space-y-4">
               <li><a href="/" onclick={() => (mobileMenuOpen = false)}>Inicio</a></li>
               <li><a href="/productos" onclick={() => (mobileMenuOpen = false)}>Productos</a></li>
+              <li><a href="/qr-scanner" onclick={() => (mobileMenuOpen = false)}>Escáner QR</a></li>
             </ul>
           </div>
         {/if}
@@ -39,6 +40,7 @@
       <ul class="menu menu-horizontal px-1">
         <li><a href="/" class="font-semibold">Inicio</a></li>
         <li><a href="/productos">Productos</a></li>
+        <li><a href="/qr-scanner">Escáner QR</a></li>
       </ul>
     </div>
 

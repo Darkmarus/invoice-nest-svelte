@@ -16,6 +16,10 @@ class NavigateUtils {
   goProductEdit(id: string) {
     navigate('/productos/editar/:id', { params: { id } });
   }
+
+  goQrScanner() {
+    (navigate as any)('/qr-scanner');
+  }
 }
 
 export const navigateUtils = new NavigateUtils();

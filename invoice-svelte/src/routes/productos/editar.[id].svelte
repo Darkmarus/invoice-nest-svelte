@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { FileResponse } from 'src/models/product_response';
-  import { navigate, route } from 'sv-router/generated';
+  import { route } from 'sv-router/generated';
+  import { navigateUtils } from '../../utils/navigate-utils';
   import { onMount } from 'svelte';
   import ProductForm from '../../components/product_form.svelte';
   import type { CombinedImage, UpdateProductImage } from '../../models/product_request';
@@ -37,15 +38,15 @@
             images: [] as File[],
           };
         } else {
-          navigate('/productos');
+          navigateUtils.goProducts();
         }
       } catch (error) {
         console.error('Error fetching product:', error);
-        navigate('/productos');
+        navigateUtils.goProducts();
       }
     } else {
       // If no product ID in query params, redirect back
-      navigate('/productos');
+      navigateUtils.goProducts();
     }
   });
 
@@ -74,14 +75,14 @@
         newImages: newImages,
         newOrders: newOrders,
       });
-      navigate('/productos');
+      navigateUtils.goProducts();
     } catch (err) {
       console.error(err);
     }
   }
 
   function handleCancel() {
-    navigate('/productos');
+    navigateUtils.goProducts();
   }
 </script>
 
@@ -112,7 +113,7 @@
 
         <ProductForm bind:newProduct bind:combinedImages />
 
-        <div class="card-actions justify-end mt-6">
+        <div class="card-actions justify-evenly mt-6">
           <button class="btn btn-ghost" onclick={handleCancel}>
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -123,7 +124,7 @@
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             </svg>
-            Actualizar Producto
+            Actualizar
           </button>
         </div>
       </div>

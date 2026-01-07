@@ -18,6 +18,7 @@
     productsStore.fetch({
       page,
       limit: itemsPerPage,
+      name: ($productsStore as any).searchQuery || undefined,
     });
   }
 </script>

@@ -8,7 +8,7 @@
 <div class="min-h-screen bg-base-200">
   <Header />
 
-  <main class="container mx-auto px-4 py-8 min-h-[calc(100vh-133px)]">
+  <main class="container mx-auto px-4 py-4 min-h-[calc(100vh-133px)]">
     {@render children()}
   </main>
 

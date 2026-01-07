@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { navigate } from 'sv-router/generated';
+  import { navigateUtils } from '../../utils/navigate-utils';
   import ProductForm from '../../components/product_form.svelte';
   import { productsStore } from '../../stores/products_store';
 
@@ -15,14 +15,14 @@
     try {
       await productsStore.create(newProduct);
       newProduct = { name: '', price: 0, stock: 0, details: '', images: [] as File[] };
-      navigate('/productos');
+      navigateUtils.goProducts();
     } catch (err) {
       console.error(err);
     }
   }
 
   function handleCancel() {
-    navigate('/productos');
+    navigateUtils.goProducts();
   }
 </script>
 

@@ -1,27 +1,11 @@
 <script lang="ts">
-  import { navigate } from 'sv-router/generated';
   import type { ProductResponse } from '../models/product_response';
-  import { productsStore } from '../stores/products_store';
+  import { navigateUtils } from '../utils/navigate-utils';
 
-  let { products } = $props<{ products: ProductResponse[] }>();
-
-  function handleEdit(product: ProductResponse) {
-    window.location.href = `/productos/editar/${product.id}`;
-  }
-
-  async function handleDelete(product: ProductResponse) {
-    const confirmed = confirm(
-      `¿Estás seguro de que quieres eliminar el producto "${product.name}"? Esta acción no se puede deshacer.`
-    );
-    if (confirmed) {
-      try {
-        await productsStore.delete(product.id);
-      } catch (error) {
-        console.error('Error deleting product:', error);
-        alert('Error al eliminar el producto. Por favor, inténtalo de nuevo.');
-      }
-    }
-  }
+  let { products, handleDelete } = $props<{
+    products: ProductResponse[];
+    handleDelete: (product: ProductResponse) => {};
+  }>();
 </script>
 
 <div class="overflow-x-auto">
@@ -57,7 +41,8 @@
           </td>
           <td>
             <div class="flex gap-2">
-              <button class="btn btn-sm btn-primary" onclick={() => handleEdit(product)}>Editar</button>
+              <button class="btn btn-sm btn-primary" onclick={() => navigateUtils.goProductEdit(product.id)}
+                >Editar</button>
               <button class="btn btn-sm btn-error" onclick={() => handleDelete(product)}>Eliminar</button>
             </div>
           </td>

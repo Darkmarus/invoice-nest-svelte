@@ -1,20 +1,36 @@
 <script lang="ts">
   let cartCount = $state(0);
+  let mobileMenuOpen = $state(false);
 </script>
 
 <section class="bg-base-100">
   <header class="container mx-auto navbar bg-base-100">
     <div class="navbar-start">
       <div class="dropdown">
-        <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+        <button
+          onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
+          class="btn btn-ghost lg:hidden"
+          aria-label="Abrir menú">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
           </svg>
-        </div>
-        <ul class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-          <li><a href="/">Inicio</a></li>
-          <li><a href="/productos">Productos</a></li>
-        </ul>
+        </button>
+        {#if mobileMenuOpen}
+          <div class="fixed inset-0 z-50 bg-base-100 flex flex-col items-center justify-center">
+            <button
+              onclick={() => (mobileMenuOpen = false)}
+              class="btn btn-ghost self-end m-4"
+              aria-label="Cerrar menú">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+            <ul class="menu menu-vertical text-xl space-y-4">
+              <li><a href="/" onclick={() => (mobileMenuOpen = false)}>Inicio</a></li>
+              <li><a href="/productos" onclick={() => (mobileMenuOpen = false)}>Productos</a></li>
+            </ul>
+          </div>
+        {/if}
       </div>
       <a href="/" class="btn btn-ghost text-xl font-bold">MiTienda</a>
     </div>
@@ -28,10 +44,6 @@
 
     <div class="navbar-end">
       <div class="flex items-center gap-2">
-        <div class="form-control">
-          <input type="text" placeholder="Buscar..." class="input input-bordered w-full md:w-auto" />
-        </div>
-
         <button class="btn btn-ghost btn-circle">
           <div class="indicator">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

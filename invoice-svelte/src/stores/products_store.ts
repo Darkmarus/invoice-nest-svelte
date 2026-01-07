@@ -11,6 +11,7 @@ export interface ProductsState {
   limit: number;
   total: number;
   totalPages: number;
+  searchQuery: string;
 }
 
 const initialState: ProductsState = {
@@ -21,6 +22,7 @@ const initialState: ProductsState = {
   limit: 10,
   total: 0,
   totalPages: 0,
+  searchQuery: '',
 };
 
 function createProductsStore() {
@@ -38,7 +40,8 @@ function createProductsStore() {
         error: err.message,
       }));
     } else {
-      set({
+      update((state) => ({
+        ...state,
         data: response!.data,
         loading: false,
         error: null,
@@ -46,13 +49,17 @@ function createProductsStore() {
         limit: response!.limit,
         total: response!.total,
         totalPages: response!.totalPages,
-      });
+      }));
     }
   };
 
   return {
     subscribe,
     fetch: fetchData,
+    setSearchQuery: (query: string) => {
+      update((state) => ({ ...state, searchQuery: query }));
+      fetchData({ ...currentParams, name: query });
+    },
     fetchProduct: async (id: string) => {
       const [err, product] = await productApiService.fetchProduct(id);
       if (err) {

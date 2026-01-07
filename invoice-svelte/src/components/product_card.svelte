@@ -108,7 +108,7 @@
     </div>
     <!-- Acciones de la tarjeta -->
     <div class="card-actions flex flex-col sm:flex-row justify-end gap-2 mt-4">
-      <button class="btn btn-primary btn-sm">Añadir al carrito</button>
+      <!-- <button class="btn btn-primary btn-sm">Añadir al carrito</button> -->
       <a href="/productos/{product.id}" class="btn btn-outline btn-sm">Ver detalles</a>
     </div>
   </div>

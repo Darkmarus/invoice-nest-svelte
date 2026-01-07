@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ProductResponse } from '../models/product_response';
   import { navigateUtils } from '../utils/navigate-utils';
+  import QrCode from './qr_code.svelte';
 
   let { products, handleDelete } = $props<{
     products: ProductResponse[];
@@ -17,6 +18,7 @@
         <!-- <th>Categoría</th> -->
         <th>Stock</th>
         <th>Imágenes</th>
+        <th>QR</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -38,6 +40,9 @@
           </td>
           <td>
             <span class="badge badge-info">{product.images?.length ?? 0}</span>
+          </td>
+          <td>
+            <QrCode id={product.id} />
           </td>
           <td>
             <div class="flex gap-2">

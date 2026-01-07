@@ -16,6 +16,7 @@
     "@tailwindcss/vite": "^4.1.18",
     "@tsconfig/svelte": "^5.0.6",
     "@types/node": "^24.10.1",
+    "@types/qrcode": "^1.5.6",
     "daisyui": "^5.5.14",
     "prettier": "^3.7.4",
     "prettier-plugin-svelte": "^3.4.1",
@@ -27,6 +28,7 @@
     "vite": "^6.3.0"
   },
   "dependencies": {
+    "qrcode": "^1.5.4",
     "svelte-easy-crop": "^5.0.0"
   }
 }

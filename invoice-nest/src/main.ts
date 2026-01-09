@@ -11,6 +11,9 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
+  // Configurar prefijo global para rutas
+  app.setGlobalPrefix('api');
+
   // Configurar manejo global de excepciones
   app.useGlobalFilters(new HttpExceptionFilter());
 

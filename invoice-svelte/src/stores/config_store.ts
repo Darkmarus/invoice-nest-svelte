@@ -35,4 +35,7 @@ export const apiUrl = (): string => {
   return get(configStore).apiUrl;
 };
 
-export const resolvedImages = (path: string) => `${apiUrl()}/${path}`;
+export const resolvedImages = (path: string) => {
+  const filename = path.split('\\').pop()?.split('/').pop();
+  return `${apiUrl()}/uploads/${filename}`;
+};
